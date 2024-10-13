@@ -22,21 +22,48 @@ public:
 
   void begin()
   {
-    pinMode(LEFT_MOTOR_PWM, OUTPUT);
-    pinMode(LEFT_MOTOR_IN1, OUTPUT);
-    pinMode(LEFT_MOTOR_IN2, OUTPUT);
-    pinMode(RIGHT_MOTOR_IN2, OUTPUT);
-    pinMode(RIGHT_MOTOR_IN1, OUTPUT);
-    pinMode(RIGHT_MOTOR_PWM, OUTPUT);
+    pinMode(LEFT_BACK_MOTOR_PWM, OUTPUT);
+    pinMode(LEFT_BACK_MOTOR_IN1, OUTPUT);
+    pinMode(LEFT_BACK_MOTOR_IN2, OUTPUT);
+    pinMode(RIGHT_BACK_MOTOR_IN2, OUTPUT);
+    pinMode(RIGHT_BACK_MOTOR_IN1, OUTPUT);
+    pinMode(RIGHT_BACK_MOTOR_PWM, OUTPUT);
 
-    digitalWrite(LEFT_MOTOR_PWM, 0);
-    digitalWrite(LEFT_MOTOR_IN1, 0);
-    digitalWrite(LEFT_MOTOR_IN2, 0);
-    digitalWrite(RIGHT_MOTOR_IN2, 0);
-    digitalWrite(RIGHT_MOTOR_IN1, 0);
-    digitalWrite(RIGHT_MOTOR_PWM, 0);
+    digitalWrite(LEFT_BACK_MOTOR_PWM, 0);
+    digitalWrite(LEFT_BACK_MOTOR_IN1, 0);
+    digitalWrite(LEFT_BACK_MOTOR_IN2, 0);
+    digitalWrite(RIGHT_BACK_MOTOR_IN2, 0);
+    digitalWrite(RIGHT_BACK_MOTOR_IN1, 0);
+    digitalWrite(RIGHT_BACK_MOTOR_PWM, 0);
+
+    pinMode(LEFT_FRONT_MOTOR_PWM, OUTPUT);
+    pinMode(LEFT_FRONT_MOTOR_IN1, OUTPUT);
+    pinMode(LEFT_FRONT_MOTOR_IN2, OUTPUT);
+    pinMode(RIGHT_FRONT_MOTOR_IN2, OUTPUT);
+    pinMode(RIGHT_FRONT_MOTOR_IN1, OUTPUT);
+    pinMode(RIGHT_FRONT_MOTOR_PWM, OUTPUT);
+
+    digitalWrite(LEFT_FRONT_MOTOR_PWM, 0);
+    digitalWrite(LEFT_FRONT_MOTOR_IN1, 0);
+    digitalWrite(LEFT_FRONT_MOTOR_IN2, 0);
+    digitalWrite(RIGHT_FRONT_MOTOR_IN2, 0);
+    digitalWrite(RIGHT_FRONT_MOTOR_IN1, 0);
+    digitalWrite(RIGHT_FRONT_MOTOR_PWM, 0);
     
     setupPWM();
+  }
+
+  void setupPWM()
+  {
+    ledcSetup(0,10000, PWM_RESOLUTION_BITS); //check for different pwm frequencies
+    ledcAttachPin(LEFT_BACK_MOTOR_PWM, 0);
+    ledcSetup(1, 10000, PWM_RESOLUTION_BITS);
+    ledcAttachPin(RIGHT_BACK_MOTOR_PWM, 1);
+    ledcSetup(2, 10000, PWM_RESOLUTION_BITS);
+    ledcAttachPin(RIGHT_BACK_MOTOR_PWM, 2);
+    ledcSetup(3, 10000, PWM_RESOLUTION_BITS);
+    ledcAttachPin(RIGHT_FRONT_MOTOR_PWM, 3);
+
   }
 
   void reset_controllers()
@@ -237,14 +264,6 @@ public:
   //     ledcWrite(1, pwm - M_BALNCE_PWM);
   //   }
   // }
-
-  void setupPWM()
-  {
-    ledcSetup(0, 5000, PWM_RESOLUTION_BITS);
-    ledcAttachPin(LEFT_MOTOR_PWM, 0);
-    ledcSetup(1, 5000, PWM_RESOLUTION_BITS);
-    ledcAttachPin(RIGHT_MOTOR_PWM, 1);
-  }
 
   //
   void enable_controllers()

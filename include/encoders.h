@@ -14,17 +14,17 @@ class Encoders
 public:
     void begin()
     {
-        pinMode(LeftEncoderPin1, INPUT_PULLUP);// can speed up gpio readtime by using gpio config(driver/gpio.h)
-        pinMode(LeftEncoderPin2, INPUT_PULLUP);
+        pinMode(LeftBackEncoderPin1, INPUT_PULLUP);// can speed up gpio readtime by using gpio config(driver/gpio.h)
+        pinMode(LeftBackEncoderPin2, INPUT_PULLUP);
 
-        pinMode(RightEncoderPin1, INPUT_PULLUP);
-        pinMode(RightEncoderPin2, INPUT_PULLUP);
+        pinMode(RightBackEncoderPin1, INPUT_PULLUP);
+        pinMode(RightBackEncoderPin2, INPUT_PULLUP);
 
-        attachInterrupt(digitalPinToInterrupt(LeftEncoderPin1), updateLeftEncoderISR, CHANGE);
-        attachInterrupt(digitalPinToInterrupt(LeftEncoderPin2), updateLeftEncoderISR, CHANGE);
+        attachInterrupt(digitalPinToInterrupt(LeftBackEncoderPin1), updateLeftEncoderISR, CHANGE);
+        attachInterrupt(digitalPinToInterrupt(LeftBackEncoderPin2), updateLeftEncoderISR, CHANGE);
 
-        attachInterrupt(digitalPinToInterrupt(RightEncoderPin1), updateRightEncoderISR, CHANGE);
-        attachInterrupt(digitalPinToInterrupt(RightEncoderPin2), updateRightEncoderISR, CHANGE);
+        attachInterrupt(digitalPinToInterrupt(RightBackEncoderPin1), updateRightEncoderISR, CHANGE);
+        attachInterrupt(digitalPinToInterrupt(RightBackEncoderPin2), updateRightEncoderISR, CHANGE);
 
         reset();
     }
@@ -55,8 +55,8 @@ public:
 
     void updateLeftEncoder()
     {
-        int MSB = digitalRead(LeftEncoderPin1); // Most Significant Bit (A)
-        int LSB = digitalRead(LeftEncoderPin2); // Least Significant Bit (B)
+        int MSB = digitalRead(LeftBackEncoderPin1); // Most Significant Bit (A)
+        int LSB = digitalRead(LeftBackEncoderPin2); // Least Significant Bit (B)
 
         int encoded = (MSB << 1) | LSB; // Create a 2-bit value from A and B
 
@@ -77,8 +77,8 @@ public:
 
     void updateRightEncoder()
     {
-        int MSB = digitalRead(RightEncoderPin1); // Most Significant Bit (A)
-        int LSB = digitalRead(RightEncoderPin2); // Least Significant Bit (B)
+        int MSB = digitalRead(RightBackEncoderPin1); // Most Significant Bit (A)
+        int LSB = digitalRead(RightBackEncoderPin2); // Least Significant Bit (B)
 
         int encoded = (MSB << 1) | LSB; // Create a 2-bit value from A and B
 

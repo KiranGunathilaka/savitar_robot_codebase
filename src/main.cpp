@@ -1,11 +1,13 @@
 #include <Arduino.h>
 #include "motors.h"
 #include "encoders.h"
+#include "sensors.h"
 #include "Ticker.h"
 #include "config.h"
 
 Motors motors;
 Encoders encoders;
+Sensors sensors;
 
 Ticker sendTicker;
 
@@ -16,35 +18,25 @@ void setup()
 
   encoders.begin();
   motors.begin();
+  //sensors.begin();
 
-  sendTicker.attach(0.02, []()
-                    { 
-  encoders.update();
-  Serial.print("Left RPS : ");
-  Serial.print(encoders.leftRPS());
-  Serial.print("   Right RPS : ");
-  Serial.println(encoders.rightRPS()); });
+  sendTicker.attach(0.03, []()
+    { 
+      encoders.update();
+      //sensors.update();
+      Serial.print("Left RPS : ");
+      Serial.print(encoders.leftRPS());
+      Serial.print("   Right RPS : ");
+      Serial.println(encoders.rightRPS()); 
+        });
 }
+
+int t =0;
 
 void loop()
 {
-  digitalWrite(LEFT_MOTOR_IN1, HIGH);
-  digitalWrite(LEFT_MOTOR_IN2, LOW);
-  ledcWrite(0, 256);
+  // Serial.println(millis()-t);
+  // t = millis();
+  //sensors.update();
 
-  digitalWrite(RIGHT_MOTOR_IN1, HIGH);
-  digitalWrite(RIGHT_MOTOR_IN2, LOW);
-  ledcWrite(1, 256);
-
-  delay(3000);
-
-  digitalWrite(LEFT_MOTOR_IN1, LOW);
-  digitalWrite(LEFT_MOTOR_IN2, HIGH);
-  ledcWrite(0, 256);
-
-  digitalWrite(RIGHT_MOTOR_IN1, LOW);
-  digitalWrite(RIGHT_MOTOR_IN2, HIGH);
-  ledcWrite(1, 256);
-
-  delay(3000);
 }
