@@ -10,6 +10,22 @@ extern Motors motors;
 
 class Motors
 {
+private:
+  float m_left_motor_percentage;
+  float m_right_motor_percentage;
+
+  float m_previous_fwd_error;
+  float m_previous_rot_error;
+  float m_fwd_error;
+  float m_rot_error;
+
+  float m_velocity;
+  float m_omega;
+
+  bool m_feedforward_enabled = true;
+  bool m_controller_output_enabled;
+  unsigned long i = 0;
+
 public:
   // remove after testing
 
@@ -49,13 +65,13 @@ public:
     digitalWrite(RIGHT_FRONT_MOTOR_IN2, 0);
     digitalWrite(RIGHT_FRONT_MOTOR_IN1, 0);
     digitalWrite(RIGHT_FRONT_MOTOR_PWM, 0);
-    
+
     setupPWM();
   }
 
   void setupPWM()
   {
-    ledcSetup(0,10000, PWM_RESOLUTION_BITS); //check for different pwm frequencies
+    ledcSetup(0, 10000, PWM_RESOLUTION_BITS); // check for different pwm frequencies
     ledcAttachPin(LEFT_BACK_MOTOR_PWM, 0);
     ledcSetup(1, 10000, PWM_RESOLUTION_BITS);
     ledcAttachPin(RIGHT_BACK_MOTOR_PWM, 1);
@@ -63,7 +79,6 @@ public:
     ledcAttachPin(RIGHT_BACK_MOTOR_PWM, 2);
     ledcSetup(3, 10000, PWM_RESOLUTION_BITS);
     ledcAttachPin(RIGHT_FRONT_MOTOR_PWM, 3);
-
   }
 
   void reset_controllers()
@@ -72,6 +87,16 @@ public:
     m_rot_error = 0;
     m_previous_fwd_error = 0;
     m_previous_rot_error = 0;
+  }
+
+  void enable_controllers()
+  {
+    m_controller_output_enabled = true;
+  }
+
+  void disable_controllers()
+  {
+    m_controller_output_enabled = false;
   }
 
   // void stop()
@@ -135,7 +160,6 @@ public:
   //   {
   //     set_left_motor_percentage(left_output);
   //     set_right_motor_percentage(right_output);
-
 
   //     // Serial.print("  left  : ");
   //     // Serial.print(left_output);
@@ -244,7 +268,7 @@ public:
 
   //   // Serial.print("   right pwm percentage: ");
   //   // Serial.println(percentage);
-    
+
   //   set_right_motor_pwm(right_pwm);
   // }
 
@@ -264,31 +288,4 @@ public:
   //     ledcWrite(1, pwm - M_BALNCE_PWM);
   //   }
   // }
-
-  //
-  void enable_controllers()
-  {
-    m_controller_output_enabled = true;
-  }
-
-  void disable_controllers()
-  {
-    m_controller_output_enabled = false;
-  }
-
-private:
-  float m_left_motor_percentage;
-  float m_right_motor_percentage;
-
-  float m_previous_fwd_error;
-  float m_previous_rot_error;
-  float m_fwd_error;
-  float m_rot_error;
-
-  float m_velocity;
-  float m_omega;
-
-  bool m_feedforward_enabled = true;
-  bool m_controller_output_enabled;
-  unsigned long i = 0;
 };

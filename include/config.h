@@ -43,20 +43,28 @@ const float DEG_PER_MM_DIFFERENCE = 180.0/(PI * WHEEL_GAP);
 //**********************************************************Sensors**********************************************************
 
 // I2C Pins for ESP32
-#define I2C_SDA 20
-#define I2C_SCL 21
+#define I2C_SDA_0 19
+#define I2C_SCL_0 20
 
-#define MULTIPLEXER_ADDR 0x70
+#define I2C_SDA_1 21
+#define I2C_SCL_1 47
+
+#define MULTIPLEXER_ADDR 0x73
 #define TCS34725_ADDR 0x29
 
-const int ToF_XSHUT_Right = 14;
-const int ToF_XSHUT_Left = 13;
+#define TCS34725_FAST_INTEGRATION_TIME 0xFE  //2 cycles,  4.8 seconds for one sensor , delay 32ms
+#define TCS34725_SLOW_INTEGRATION_TIME 0xFC  //4 cycles,  9.6 seconds for one sensor , delay 57ms
+
+const int ToF_XSHUT_Right = 9;
+const int ToF_XSHUT_Left = 10;
+const int ToF_XSHUT_Front = 11;
 const int ToF_XSHUT_Center_Top = 12;
-const int ToF_XSHUT_Center_Bottom = 15;
+const int ToF_XSHUT_Center_Bottom = 13;
 
 const int TOF_LEFT_ADD = 0x30;
 const int TOF_RIGHT_ADD = 0x31;
-const int TOF_CENTER_TOP_ADD = 0x32;
+const int TOF_FRONT_ADD = 0x32;
+const int TOF_CENTER_TOP_ADD = 0x33;
 const int TOF_CENTER_BOTTOM_ADD = 0x34;
 
 

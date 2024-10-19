@@ -17,26 +17,29 @@ void setup()
   Serial.begin(115200);
 
   encoders.begin();
-  motors.begin();
-  //sensors.begin();
+  //motors.begin();
+  sensors.begin();
 
-  sendTicker.attach(0.03, []()
-    { 
-      encoders.update();
-      //sensors.update();
-      Serial.print("Left RPS : ");
-      Serial.print(encoders.leftRPS());
-      Serial.print("   Right RPS : ");
-      Serial.println(encoders.rightRPS()); 
-        });
+  // sendTicker.attach(0.03, []()
+  //   { 
+  //     encoders.update();
+  //     //sensors.update();
+  //     Serial.print("Left RPS : ");
+  //     Serial.print(encoders.leftRPS());
+  //     Serial.print("   Right RPS : ");
+  //     Serial.println(encoders.rightRPS()); 
+  //       });
 }
 
-int t =0;
+int x =0;
 
 void loop()
 {
-  // Serial.println(millis()-t);
-  // t = millis();
-  //sensors.update();
+  Serial.print(millis()-x);
+  Serial.print("  ");
+  x = millis();
+
+  sensors.enableToFReadings();
+  sensors.update();
 
 }
