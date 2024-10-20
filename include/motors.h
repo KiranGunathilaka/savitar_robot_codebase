@@ -170,7 +170,7 @@ public:
 
   float left_feed_forward_percentage(float left_feed_velocity)
   {
-    ///////give the percentage required to acheive a given velocity--- |v|<500
+    //gives the percentage required to acheive a given velocity--- |v|<500
     int l_rps = (left_feed_velocity * PULSES_PER_ROTATION) / MM_PER_ROTATION;
 
     float l_feed_percentage = 289.6 - sqrt(-6.329 * l_rps + 85635.1);
@@ -179,7 +179,7 @@ public:
 
   float right_feed_forward_percentage(float left_feed_velocity)
   {
-    ///////give the percentage required to acheive a given velocity--- |v|<500
+    //gives the percentage required to acheive a given velocity--- |v|<500
     int r_rps = (left_feed_velocity * PULSES_PER_ROTATION) / MM_PER_ROTATION;
 
     float r_feed_percentage = 289.6 - sqrt(-6.329 * r_rps + 85635.1);

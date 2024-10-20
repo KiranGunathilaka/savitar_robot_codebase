@@ -119,11 +119,11 @@ public:
         {
             return WHITE;
         }
-        else if (r > g + redToGreenOffset[i][modeIndex] && r > b + redToBlueOffset[i][modeIndex])
+        else if (r > g + redToGreenOffset[i][modeIndex] && r > b + redToBlueOffset[i][modeIndex] )
         {
             return RED;
         }
-        else if (b > r + blueToRedOffset[i][modeIndex] && b > g + blueToGreenOffset[i][modeIndex])
+        else if (b > r + blueToRedOffset[i][modeIndex] && b > g + blueToGreenOffset[i][modeIndex] )
         {
             return BLUE;
         }
@@ -160,7 +160,7 @@ public:
             center_bottom_tof = abs(prevCenterBottom - center_bottom_tof) > 3 ? center_bottom_tof : prevCenterBottom;
             center_top_tof = abs(prevCenterTop - center_top_tof) > 3 ? center_top_tof : prevCenterTop;
 
-            // Serial.print(right_tof);
+            //Serial.print(right_tof);
             // Serial.print(" ");
             // Serial.print(left_tof);
             // Serial.print(" ");
@@ -206,11 +206,11 @@ public:
                     colorStr = "UNKNOWN";
                     break;
                 }
-                //Serial.printf("sensor %d : %s  ",t-2, colorStr); 
+                Serial.printf("sensor %d : %s  ",t-2, colorStr); 
 
                 // Serial.printf(" r: %f g: %f b: %f c: %d lux:%d ", r_ratio, g_ratio, b_ratio, c, lux);
             }
-            //Serial.print("\n");
+            Serial.print("\n");
         }
     }
 
@@ -532,8 +532,8 @@ private:
                 return false;
 
             // Store red-green and red-blue offsets
-            redToGreenOffset[sensor][modeIndex] = (reading.r_ratio - reading.g_ratio) * 0.5; // Red to green threshold
-            redToBlueOffset[sensor][modeIndex] = (reading.r_ratio - reading.b_ratio) * 0.5;  // Red to blue threshold
+            redToGreenOffset[sensor][modeIndex] = (reading.r_ratio - reading.g_ratio) * 0.7; // Red to green threshold
+            redToBlueOffset[sensor][modeIndex] = (reading.r_ratio - reading.b_ratio) * 0.7;  // Red to blue threshold
         }
         return true;
     }

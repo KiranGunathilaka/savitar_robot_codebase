@@ -73,6 +73,6 @@ const int SWITCH_PIN = 7;
 
 //*************************************************************SYSTICK*******************************************
 
-#define FAST_TICKER 0.033
-#define SLOW_TICKER 0.058
+#define FAST_TICKER 0.035
+#define SLOW_TICKER 0.059
 
