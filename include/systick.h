@@ -15,17 +15,14 @@ class Systick
 {
 private:
     double tickerTime = FAST_TICKER;
+    bool slowMode = false;
     Ticker ticker;
     
 public:
-    void setTickerTime(double time)
-    {
-        tickerTime = time;
-    }
 
-    double getTickerTime()
+    bool isSlowModeEnabled()
     {
-        return tickerTime;
+        return slowMode;
     }
 
     void begin()
@@ -35,14 +32,31 @@ public:
                         encoders.update();
                         //motors.update();
                         sensors.update();
+
                         Serial.print(time.getTimeDiff());
                         Serial.print("  ");
                          });
     }
 
-    void tickerReset()
+    void enableSlowMode(bool enable)
     {
-        ticker.detach();
-        begin();
+        if (enable != slowMode){
+            ticker.detach();
+            if (enable){
+                tickerTime = SLOW_TICKER;
+                sensors.enableFastMode(false);
+                begin();
+                Serial.print("Slow Mode");
+            }
+            else{
+                tickerTime = FAST_TICKER;
+                sensors.enableFastMode(true);
+                begin();
+                Serial.print("Fast Mode");
+            }
+            
+            slowMode = enable;
+        }
+        
     }
 };

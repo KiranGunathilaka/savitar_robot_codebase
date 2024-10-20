@@ -1,7 +1,10 @@
+#pragma once
+
 #include <Wire.h>
 #include <Adafruit_TCS34725.h>
 #include <VL53L0X.h>
 #include "config.h"
+#include "switches.h"
 
 class Sensors;
 extern Sensors sensors;
@@ -10,39 +13,58 @@ class Sensors
 {
 private:
     int integration_time = TCS34725_FAST_INTEGRATION_TIME;
+    bool isFast = true;
+    int modeIndex = 0; // 0 for fast mode(default) , 1 for fast mode
+    //this index will be used to get values from the offset and threshold arrs
+
     bool tofEnabled = true;
     bool colourEnabled = true;
 
     bool isWire1Init = false;
     bool isWire0Init = false;
 
-    int redOffset = 0.4;
-    int greenOffset = 0.05;
-    int blueOffset = 0.05;
-    int whiteThreshold = 8;
-    int blackThreshold = 5;
+    int rgOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+    int rbOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+    int brOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+    int bgOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+    int whiteThreshold[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+    int blackThreshold[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
 
 public:
     VL53L0X tofRight, tofLeft, tofFront, tofCenterTop, tofCenterBottom;
     int prevLeft, prevRight, prevFront, prevCenterTop, prevCenterBottom;
     volatile int left_tof, right_tof, front_tof, center_top_tof, center_bottom_tof;
 
-    const int tofOffset[5] = {-10, -16, -10, -15, -10}; //adjust these values
+    const int tofOffset[5] = {-10, -16, -10, -15, -10}; // adjust these values
 
     Adafruit_TCS34725 *colourSensorArr[5];
+
 
     enum Colors
     {
         UNKNOWN,
+        WHITE,
         RED,
         BLUE,
-        WHITE,
         BLACK
     };
 
-    void setIntegrationTime(int time)
+
+    // to swtich between colour sensor 2 cycle mode and 4 cycle mode
+    void enableFastMode(bool enabled)
     {
-        integration_time = time;
+        isFast = enabled;
+
+        if (!isFast)
+        {
+            modeIndex = 1;
+            integration_time = TCS34725_SLOW_INTEGRATION_TIME;
+        }
+        else
+        {
+            modeIndex = 0;
+            integration_time = TCS34725_FAST_INTEGRATION_TIME;
+        }
     }
 
     // to not take readings and save time
@@ -91,22 +113,22 @@ public:
         tofReset();
     }
 
-    Colors classifyColor(float r, float g, float b, uint16_t lux)
+    Colors classifyColor(int i, float r, float g, float b, uint16_t lux)
     {
         // Find the dominant color
-        if (lux > whiteThreshold)
+        if (lux > whiteThreshold[i][modeIndex])
         {
             return WHITE;
         }
-        else if (r > g + redOffset && r > b + redOffset)
+        else if (r > g + rgOffset[i][modeIndex] && r > b + rbOffset[i][modeIndex])
         {
             return RED;
         }
-        else if (b > r + blueOffset && b > g + blueOffset)
+        else if (b > r + brOffset[i][modeIndex] && b > g + bgOffset[i][modeIndex])
         {
             return BLUE;
         }
-        else if (lux < blackThreshold)
+        else if (lux < blackThreshold[i][modeIndex])
         {
             return BLACK;
         }
@@ -140,15 +162,15 @@ public:
             center_top_tof = abs(prevCenterTop - center_top_tof) > 3 ? center_top_tof : prevCenterTop;
 
             // Serial.print(right_tof);
-            Serial.print(" ");
-            Serial.print(left_tof);
-            Serial.print(" ");
-            Serial.print(front_tof);
-            Serial.print(" ");
-            Serial.print(center_bottom_tof);
-            Serial.print(" ");
-            Serial.print(center_top_tof);
-            Serial.print("    ");
+            // Serial.print(" ");
+            // Serial.print(left_tof);
+            // Serial.print(" ");
+            // Serial.print(front_tof);
+            // Serial.print(" ");
+            // Serial.print(center_bottom_tof);
+            // Serial.print(" ");
+            // Serial.print(center_top_tof);
+            // Serial.print("    ");
         }
 
         if (colourEnabled)
@@ -166,16 +188,16 @@ public:
                 g_ratio = (float)g / c;
                 b_ratio = (float)b / c;
 
-                int color = classifyColor(r_ratio, g_ratio, b_ratio, lux);
+                int color = classifyColor(t - 3, r_ratio, g_ratio, b_ratio, lux);
 
-                Serial.printf("Sensor %d  : %s   ", t - 2, color == 0 ? "UNKONWN" : color == 1 ? "RED"
-                                                                                : color == 2   ? "BLUE"
-                                                                                : color == 3   ? "WHITE"
-                                                                                               : "BLACK");
+                // Serial.printf("Sensor %d  : %s   ", t - 2, color == 0 ? "UNKONWN" : color == 1 ? "RED"
+                //                                                                 : color == 2   ? "BLUE"
+                //                                                                 : color == 3   ? "WHITE"
+                //                                                                                : "BLACK");
 
-                //Serial.printf(" r: %f g: %f b: %f c: %d lux:%d ", r_ratio, g_ratio, b_ratio, c, lux);
+                // Serial.printf(" r: %f g: %f b: %f c: %d lux:%d ", r_ratio, g_ratio, b_ratio, c, lux);
             }
-            Serial.print("\n");
+            // Serial.print("\n");
         }
     }
 
@@ -271,6 +293,19 @@ public:
             {
                 Serial.printf("Failed to initialize sensor %d\n", t - 3);
             }
+        }
+    }
+
+    void csCalibarate()
+    {
+        bool redCalibed = false;
+        bool blueCalibed = false;
+        bool whiteCalibed = false;
+        bool blackCalibed = false;
+
+        while (redCalibed && blackCalibed && whiteCalibed && blackCalibed)
+        {
+            int nowCalibing = switches.switchRead();
         }
     }
 };

@@ -1,11 +1,13 @@
 #include <Arduino.h>
 #include "systick.h"
 #include "config.h"
+#include "switches.h"
 
 Motors motors;
 Encoders encoders;
 Sensors sensors;
 Systick systick;
+Switches switches;
 Time time;
 
 
@@ -18,17 +20,10 @@ void setup()
   sensors.begin();
   systick.begin();
 
-  delay(10000);
+  switches.enableSimulation(true);
 }
 
 void loop()
 {
-  sensors.enableToFReadings();
 
-
-  systick.setTickerTime(SLOW_TICKER);
-  systick.tickerReset();
-
-  Serial.println("reattached");
-  delay(100000);
 }
