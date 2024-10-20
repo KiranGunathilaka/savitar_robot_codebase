@@ -9,8 +9,8 @@ extern Sensors sensors;
 class Sensors
 {
 private:
-    int integration_time = TCS34725_SLOW_INTEGRATION_TIME;
-    bool tofEnabled = false;
+    int integration_time = TCS34725_FAST_INTEGRATION_TIME;
+    bool tofEnabled = true;
     bool colourEnabled = true;
 
     bool isWire1Init = false;
@@ -25,8 +25,9 @@ private:
 public:
     VL53L0X tofRight, tofLeft, tofFront, tofCenterTop, tofCenterBottom;
     int prevLeft, prevRight, prevFront, prevCenterTop, prevCenterBottom;
-    const int tofOffset[5] = {-10, -16, -10, -15, -10};
     volatile int left_tof, right_tof, front_tof, center_top_tof, center_bottom_tof;
+
+    const int tofOffset[5] = {-10, -16, -10, -15, -10}; //adjust these values
 
     Adafruit_TCS34725 *colourSensorArr[5];
 

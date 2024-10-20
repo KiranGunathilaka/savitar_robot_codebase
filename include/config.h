@@ -67,4 +67,12 @@ const int TOF_FRONT_ADD = 0x32;
 const int TOF_CENTER_TOP_ADD = 0x33;
 const int TOF_CENTER_BOTTOM_ADD = 0x34;
 
+//*************************************************************SWITCHES******************************************
+
+const int SWITCH_PIN = 7;
+
+//*************************************************************SYSTICK*******************************************
+
+#define FAST_TICKER 0.033
+#define SLOW_TICKER 0.058
 

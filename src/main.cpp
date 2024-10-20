@@ -1,45 +1,34 @@
 #include <Arduino.h>
-#include "motors.h"
-#include "encoders.h"
-#include "sensors.h"
-#include "Ticker.h"
+#include "systick.h"
 #include "config.h"
 
 Motors motors;
 Encoders encoders;
 Sensors sensors;
+Systick systick;
+Time time;
 
-Ticker sendTicker;
 
 void setup()
 {
-  // sets the pins as outputs:
   Serial.begin(115200);
 
   encoders.begin();
-  //motors.begin();
+  // motors.begin();
   sensors.begin();
+  systick.begin();
 
-  // sendTicker.attach(0.03, []()
-  //   { 
-  //     encoders.update();
-  //     //sensors.update();
-  //     Serial.print("Left RPS : ");
-  //     Serial.print(encoders.leftRPS());
-  //     Serial.print("   Right RPS : ");
-  //     Serial.println(encoders.rightRPS()); 
-  //       });
+  delay(10000);
 }
-
-int x =0;
 
 void loop()
 {
-  Serial.print(millis()-x);
-  Serial.print("  ");
-  x = millis();
-
   sensors.enableToFReadings();
-  sensors.update();
 
+
+  systick.setTickerTime(SLOW_TICKER);
+  systick.tickerReset();
+
+  Serial.println("reattached");
+  delay(100000);
 }

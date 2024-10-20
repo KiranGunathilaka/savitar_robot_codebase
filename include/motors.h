@@ -5,7 +5,6 @@
 #include "encoders.h"
 
 class Motors;
-// testng
 extern Motors motors;
 
 class Motors
