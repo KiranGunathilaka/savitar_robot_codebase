@@ -33,8 +33,8 @@ public:
                         //motors.update();
                         sensors.update();
 
-                        Serial.print(time.getTimeDiff());
-                        Serial.print("  ");
+                        // Serial.print(time.getTimeDiff());
+                        // Serial.print("  ");
                          });
     }
 

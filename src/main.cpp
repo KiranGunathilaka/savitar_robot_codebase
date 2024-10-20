@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "nvs.h"
 #include "systick.h"
 #include "config.h"
 #include "switches.h"
@@ -9,6 +10,7 @@ Sensors sensors;
 Systick systick;
 Switches switches;
 Time time;
+NVS nvs;
 
 
 void setup()
@@ -21,6 +23,17 @@ void setup()
   systick.begin();
 
   switches.enableSimulation(true);
+
+  systick.enableSlowMode(false);
+  sensors.calibrateSensors();
+  nvs.saveCalibrationData();
+
+  systick.enableSlowMode(true);
+  sensors.calibrateSensors();
+  nvs.saveCalibrationData();
+
+  nvs.loadCalibrationData();
+  sensors.printCalibrationData();
 }
 
 void loop()
