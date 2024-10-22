@@ -5,7 +5,7 @@
 #include "encoders.h"
 #include "sensors.h"
 #include "Ticker.h"
-#include "time.h"
+#include "printer.h"
 #include "config.h"
 
 class Systick;
@@ -33,8 +33,7 @@ public:
                         //motors.update();
                         sensors.update();
 
-                        Serial.print(time.getTimeDiff());
-                        Serial.print("  ");
+                        printer.printTimeDiff(true);
                          });
     }
 

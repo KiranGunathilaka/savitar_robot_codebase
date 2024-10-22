@@ -3,13 +3,14 @@
 #include "systick.h"
 #include "config.h"
 #include "switches.h"
+#include "printer.h"
 
 Motors motors;
 Encoders encoders;
 Sensors sensors;
 Systick systick;
 Switches switches;
-Time time;
+Printer printer;
 NVS nvs;
 
 
@@ -33,7 +34,7 @@ void setup()
   // nvs.saveCalibrationData();
 
   nvs.loadCalibrationData();
-  sensors.printCalibrationData();
+  printer.printCalibrationData();
 }
 
 void loop()

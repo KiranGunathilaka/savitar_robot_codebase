@@ -20,34 +20,21 @@ public:
 
     Adafruit_TCS34725 *colourSensorArr[5];
 
+    int whiteThreshold[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+    int redToGreenOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+    int redToBlueOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+    int blueToRedOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+    int blueToGreenOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+    int blackThreshold[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+
     enum Colors
     {
-        UNKNOWN,
         WHITE,
         RED,
         BLUE,
-        BLACK
+        BLACK,
+        UNKNOWN
     };
-
-    enum CalibrationColor
-    {
-        CAL_WHITE = 0,
-        CAL_RED = 1,
-        CAL_BLUE = 2,
-        CAL_BLACK = 3
-    };
-
-    int whiteThreshold[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
-
-    int redToGreenOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
-
-    int redToBlueOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
-
-    int blueToRedOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
-
-    int blueToGreenOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
-
-    int blackThreshold[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
 
     // to swtich between colour sensor 2 cycle mode and 4 cycle mode
     void enableFastMode(bool enabled)
@@ -112,22 +99,22 @@ public:
         tofReset();
     }
 
-    Colors classifyColor(int i, float r, float g, float b, uint16_t lux)
+    Colors classifyColor(int sensor, float r, float g, float b, uint16_t lux)
     {
         // Find the dominant color
-        if (lux > whiteThreshold[i][modeIndex])
+        if (lux > whiteThreshold[sensor][modeIndex])
         {
             return WHITE;
         }
-        else if (r > g + redToGreenOffset[i][modeIndex] && r > b + redToBlueOffset[i][modeIndex] )
+        else if (r > g + redToGreenOffset[sensor][modeIndex] && r > b + redToBlueOffset[sensor][modeIndex])
         {
             return RED;
         }
-        else if (b > r + blueToRedOffset[i][modeIndex] && b > g + blueToGreenOffset[i][modeIndex] )
+        else if (b > r + blueToRedOffset[sensor][modeIndex] && b > g + blueToGreenOffset[sensor][modeIndex])
         {
             return BLUE;
         }
-        else if (lux < blackThreshold[i][modeIndex])
+        else if (lux < blackThreshold[sensor][modeIndex])
         {
             return BLACK;
         }
@@ -160,16 +147,16 @@ public:
             center_bottom_tof = abs(prevCenterBottom - center_bottom_tof) > 3 ? center_bottom_tof : prevCenterBottom;
             center_top_tof = abs(prevCenterTop - center_top_tof) > 3 ? center_top_tof : prevCenterTop;
 
-            //Serial.print(right_tof);
-            // Serial.print(" ");
-            // Serial.print(left_tof);
-            // Serial.print(" ");
-            // Serial.print(front_tof);
-            // Serial.print(" ");
-            // Serial.print(center_bottom_tof);
-            // Serial.print(" ");
-            // Serial.print(center_top_tof);
-            // Serial.print("    ");
+            // Serial.print(right_tof);
+            //  Serial.print(" ");
+            //  Serial.print(left_tof);
+            //  Serial.print(" ");
+            //  Serial.print(front_tof);
+            //  Serial.print(" ");
+            //  Serial.print(center_bottom_tof);
+            //  Serial.print(" ");
+            //  Serial.print(center_top_tof);
+            //  Serial.print("    ");
         }
 
         if (colourEnabled)
@@ -206,7 +193,7 @@ public:
                     colorStr = "UNKNOWN";
                     break;
                 }
-                Serial.printf("sensor %d : %s  ",t-2, colorStr); 
+                Serial.printf("sensor %d : %s  ", t - 2, colorStr);
 
                 // Serial.printf(" r: %f g: %f b: %f c: %d lux:%d ", r_ratio, g_ratio, b_ratio, c, lux);
             }
@@ -311,7 +298,7 @@ public:
 
     bool calibrateSensors()
     {
-        CalibrationColor currentColor = CAL_WHITE;
+        Colors currentColor = WHITE;
         bool calibrationComplete = false;
 
         Serial.println("Starting color sensor calibration...");
@@ -326,31 +313,31 @@ public:
             {
                 switch (currentColor)
                 {
-                case CAL_WHITE:
+                case WHITE:
                     if (calibrateWhite())
                     {
-                        currentColor = CAL_RED;
+                        currentColor = RED;
                         Serial.println("WHITE calibrated. Place sensors on RED surface and press SW1");
                     }
                     break;
 
-                case CAL_RED:
+                case RED:
                     if (calibrateRed())
                     {
-                        currentColor = CAL_BLUE;
+                        currentColor = BLUE;
                         Serial.println("RED calibrated. Place sensors on BLUE surface and press SW1");
                     }
                     break;
 
-                case CAL_BLUE:
+                case BLUE:
                     if (calibrateBlue())
                     {
-                        currentColor = CAL_BLACK;
+                        currentColor = BLACK;
                         Serial.println("BLUE calibrated. Place sensors on BLACK surface and press SW1");
                     }
                     break;
 
-                case CAL_BLACK:
+                case BLACK:
                     if (calibrateBlack())
                     {
                         calibrationComplete = true;
@@ -369,83 +356,6 @@ public:
         }
 
         return true;
-    }
-
-    void printCalibrationData()
-    {
-        Serial.println("\n=== Sensor Calibration Data ===");
-
-        // Print White Thresholds
-        Serial.println("\nWhite Thresholds [sensor][mode]:");
-        Serial.println("       Fast Mode  Slow Mode");
-        Serial.println("       ---------  ---------");
-        for (int i = 0; i < 5; i++)
-        {
-            Serial.printf("S%d:     %-9d %-9d\n",
-                          i + 1,
-                          sensors.whiteThreshold[i][0],
-                          sensors.whiteThreshold[i][1]);
-        }
-
-        // Print Red Offsets
-        Serial.println("\nRed to Green Offsets:");
-        Serial.println("       Fast Mode  Slow Mode");
-        Serial.println("       ---------  ---------");
-        for (int i = 0; i < 5; i++)
-        {
-            Serial.printf("S%d:     %-9f %-9f\n",
-                          i + 1,
-                          sensors.redToGreenOffset[i][0],
-                          sensors.redToGreenOffset[i][1]);
-        }
-
-        Serial.println("\nRed to Blue Offsets:");
-        Serial.println("       Fast Mode  Slow Mode");
-        Serial.println("       ---------  ---------");
-        for (int i = 0; i < 5; i++)
-        {
-            Serial.printf("S%d:     %-9f %-9f\n",
-                          i + 1,
-                          sensors.redToBlueOffset[i][0],
-                          sensors.redToBlueOffset[i][1]);
-        }
-
-        // Print Blue Offsets
-        Serial.println("\nBlue to Red Offsets:");
-        Serial.println("       Fast Mode  Slow Mode");
-        Serial.println("       ---------  ---------");
-        for (int i = 0; i < 5; i++)
-        {
-            Serial.printf("S%d:     %-9f %-9f\n",
-                          i + 1,
-                          sensors.blueToRedOffset[i][0],
-                          sensors.blueToRedOffset[i][1]);
-        }
-
-        Serial.println("\nBlue to Green Offsets:");
-        Serial.println("       Fast Mode  Slow Mode");
-        Serial.println("       ---------  ---------");
-        for (int i = 0; i < 5; i++)
-        {
-            Serial.printf("S%d:     %-9f %-9f\n",
-                          i + 1,
-                          sensors.blueToGreenOffset[i][0],
-                          sensors.blueToGreenOffset[i][1]);
-        }
-
-        // Print Black Thresholds
-        Serial.println("\nBlack Thresholds:");
-        Serial.println("       Fast Mode  Slow Mode");
-        Serial.println("       ---------  ---------");
-        for (int i = 0; i < 5; i++)
-        {
-            Serial.printf("S%d:     %-9d %-9d\n",
-                          i + 1,
-                          sensors.blackThreshold[i][0],
-                          sensors.blackThreshold[i][1]);
-        }
-
-        Serial.println("\n=== End of Calibration Data ===\n");
     }
 
 private:
