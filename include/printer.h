@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 #include "sensors.h"
+//Do not call this function inside the sensors class as it will result in circular dependency error
+
 
 class Printer;
 extern Printer printer;
@@ -12,12 +14,15 @@ public:
     int x = 0;
     int diff = 0;
 
-    void printTimeDiff(bool newLine)
+    void printTimeDiff(bool newLine = true)
     {
-        Serial.print(millis()-x);
-        if (newLine){
+        Serial.print(millis() - x);
+        if (newLine)
+        {
             Serial.print("\n");
-        }else{
+        }
+        else
+        {
             Serial.print(" ");
         }
         x = millis();
@@ -98,5 +103,62 @@ public:
         }
 
         Serial.println("\n=== End of Calibration Data ===\n");
+    }
+
+    void printTof(bool newline = false)
+    {
+        Serial.print(sensors.right_tof);
+        Serial.print(" ");
+        Serial.print(sensors.left_tof);
+        Serial.print(" ");
+        Serial.print(sensors.front_tof);
+        Serial.print(" ");
+        Serial.print(sensors.center_bottom_tof);
+        Serial.print(" ");
+        Serial.print(sensors.center_top_tof);
+        Serial.print("    ");
+
+        if (newline)
+        {
+            Serial.print("\n");
+        }
+    }
+
+    void printAllColors(bool newline = false)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            const char *colorStr;
+            switch (sensors.sensorColors[i])
+            {
+            case Sensors::WHITE:
+                colorStr = "WHITE";
+                break;
+            case Sensors::RED:
+                colorStr = "RED";
+                break;
+            case Sensors::BLUE:
+                colorStr = "BLUE";
+                break;
+            case Sensors::BLACK:
+                colorStr = "BLACK";
+                break;
+            default:
+                colorStr = "UNKNOWN";
+                break;
+            }
+
+            Serial.printf("sensor %d: %s", i, colorStr);
+
+            if (i < 4)
+            {
+                Serial.print("  |  "); // separator between sensors
+            }
+        }
+
+        if (newline)
+        {
+            Serial.print("\n");
+        }
     }
 };

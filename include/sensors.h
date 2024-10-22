@@ -5,12 +5,34 @@
 #include <VL53L0X.h>
 #include "config.h"
 #include "switches.h"
+#include "encoders.h"
 
 class Sensors;
 extern Sensors sensors;
 
 class Sensors
 {
+private:
+
+
+    int integration_time = TCS34725_FAST_INTEGRATION_TIME;
+    bool isFast = true;
+
+    // 0 for fast mode(default - black n white) , 1 for slow mode (Colour follwing)-this index will be used to get values from the offset and threshold arrs
+    int modeIndex = 0;
+
+    bool tofEnabled = true;
+    bool colourEnabled = true;
+
+    bool isWire1Init = false;
+    bool isWire0Init = false;
+
+    
+    float last_steering_error = 0;
+    float accumelated_steering_error = 0;
+    volatile float cross_track_error;
+    volatile float steering_adjustment;
+
 public:
     VL53L0X tofRight, tofLeft, tofFront, tofCenterTop, tofCenterBottom;
     int prevLeft, prevRight, prevFront, prevCenterTop, prevCenterBottom;
@@ -18,14 +40,6 @@ public:
 
     const int tofOffset[5] = {-10, -16, -10, -15, -10}; // adjust these values
 
-    Adafruit_TCS34725 *colourSensorArr[5];
-
-    int whiteThreshold[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
-    int redToGreenOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
-    int redToBlueOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
-    int blueToRedOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
-    int blueToGreenOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
-    int blackThreshold[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
 
     enum Colors
     {
@@ -35,6 +49,43 @@ public:
         BLACK,
         UNKNOWN
     };
+
+    Adafruit_TCS34725 *colourSensorArr[5];
+    bool sensorsOnLine[5] = {false, false, false, false, false}; //stores whether each sensor detected the currently following color
+    Colors sensorColors[5] = {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN}; 
+
+    int whiteThreshold[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+    float redToGreenOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+    float redToBlueOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+    float blueToRedOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+    float blueToGreenOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+    int blackThreshold[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+
+    Colors followingColor = WHITE;
+
+    enum
+    {
+        STEER_NORMAL,
+        STEERING_OFF,
+    };
+
+    uint8_t steering_mode = STEER_NORMAL;
+
+    // Initialize all sensors
+    void begin()
+    {
+        pinMode(ToF_XSHUT_Right, OUTPUT);
+        pinMode(ToF_XSHUT_Left, OUTPUT);
+        pinMode(ToF_XSHUT_Front, OUTPUT);
+        pinMode(ToF_XSHUT_Center_Top, OUTPUT);
+        pinMode(ToF_XSHUT_Center_Bottom, OUTPUT);
+
+        colourSensorReset();
+
+        tofReset();
+
+        enableFastMode(true);
+    }
 
     // to swtich between colour sensor 2 cycle mode and 4 cycle mode
     void enableFastMode(bool enabled)
@@ -51,6 +102,10 @@ public:
             modeIndex = 0;
             integration_time = TCS34725_FAST_INTEGRATION_TIME;
         }
+    }
+
+    int getModeIndex(){
+        return modeIndex;
     }
 
     // to not take readings and save time
@@ -74,56 +129,42 @@ public:
         colourEnabled = false;
     }
 
-    // Select multiplexer channel
-    bool selectChannel(uint8_t channel)
+    float get_steering_adjustment()
     {
-        if (channel > 7)
-            return false;
-
-        Wire1.beginTransmission(MULTIPLEXER_ADDR);
-        Wire1.write(1 << channel);
-        return (Wire1.endTransmission() == 0);
+        return steering_adjustment;
     }
 
-    // Initialize all sensors
-    void begin()
+    void setFollowingColor(Colors color)
     {
-        pinMode(ToF_XSHUT_Right, OUTPUT);
-        pinMode(ToF_XSHUT_Left, OUTPUT);
-        pinMode(ToF_XSHUT_Front, OUTPUT);
-        pinMode(ToF_XSHUT_Center_Top, OUTPUT);
-        pinMode(ToF_XSHUT_Center_Bottom, OUTPUT);
-
-        colourSensorReset();
-
-        tofReset();
+        followingColor = color;
     }
 
-    Colors classifyColor(int sensor, float r, float g, float b, uint16_t lux)
+    Colors getFollowingColor()
     {
-        // Find the dominant color
-        if (lux > whiteThreshold[sensor][modeIndex])
-        {
-            return WHITE;
-        }
-        else if (r > g + redToGreenOffset[sensor][modeIndex] && r > b + redToBlueOffset[sensor][modeIndex])
-        {
-            return RED;
-        }
-        else if (b > r + blueToRedOffset[sensor][modeIndex] && b > g + blueToGreenOffset[sensor][modeIndex])
-        {
-            return BLUE;
-        }
-        else if (lux < blackThreshold[sensor][modeIndex])
-        {
-            return BLACK;
-        }
-        return UNKNOWN; // consider unknown to be the colour of the background as in the interfaces of 2 colours it gives none of the above values
+        return followingColor;
+    }
+
+    void set_steering_mode(uint8_t mode)
+    {
+        last_steering_error = cross_track_error;
+        steering_adjustment = 0;
+        steering_mode = mode;
+    }
+
+    void calculate_steering_adjustment()
+    {
+        float pTerm = steering_kp * cross_track_error;
+        float dTerm = steering_kd * (cross_track_error - last_steering_error);
+        float iTerm = steering_ki * (accumelated_steering_error);
+
+        float adjustment = (pTerm + dTerm + iTerm) * encoders.loopTime_s();
+
+        last_steering_error = cross_track_error;
+        steering_adjustment = adjustment;
     }
 
     void update()
     {
-
         if (tofEnabled)
         {
             // prevRight = right_tof;
@@ -146,17 +187,6 @@ public:
             front_tof = abs(prevFront - front_tof) > 3 ? front_tof : prevFront;
             center_bottom_tof = abs(prevCenterBottom - center_bottom_tof) > 3 ? center_bottom_tof : prevCenterBottom;
             center_top_tof = abs(prevCenterTop - center_top_tof) > 3 ? center_top_tof : prevCenterTop;
-
-            // Serial.print(right_tof);
-            //  Serial.print(" ");
-            //  Serial.print(left_tof);
-            //  Serial.print(" ");
-            //  Serial.print(front_tof);
-            //  Serial.print(" ");
-            //  Serial.print(center_bottom_tof);
-            //  Serial.print(" ");
-            //  Serial.print(center_top_tof);
-            //  Serial.print("    ");
         }
 
         if (colourEnabled)
@@ -173,32 +203,69 @@ public:
                 float g_ratio = (float)g / c;
                 float b_ratio = (float)b / c;
 
-                int color = sensors.classifyColor(t - 3, r_ratio, g_ratio, b_ratio, lux);
-                const char *colorStr;
-                switch (color)
-                {
-                case Sensors::WHITE:
-                    colorStr = "WHITE";
-                    break;
-                case Sensors::RED:
-                    colorStr = "RED";
-                    break;
-                case Sensors::BLUE:
-                    colorStr = "BLUE";
-                    break;
-                case Sensors::BLACK:
-                    colorStr = "BLACK";
-                    break;
-                default:
-                    colorStr = "UNKNOWN";
-                    break;
-                }
-                Serial.printf("sensor %d : %s  ", t - 2, colorStr);
+                Colors color = sensors.classifyColor(t - 3, r_ratio, g_ratio, b_ratio, lux);
+                sensorColors[t-3] = color;
 
                 // Serial.printf(" r: %f g: %f b: %f c: %d lux:%d ", r_ratio, g_ratio, b_ratio, c, lux);
+
+                int error = 0;
+
+                if (followingColor == color && steering_mode == STEER_NORMAL)
+                {
+                    error += SENSOR_WEIGHTS[t - 3];
+                    sensorsOnLine[t - 3] = true;
+                }
+
+                cross_track_error = error;
+                calculate_steering_adjustment();
             }
-            Serial.print("\n");
         }
+    }
+
+    // Select multiplexer channel
+    bool selectChannel(uint8_t channel)
+    {
+        if (channel > 7)
+            return false;
+
+        Wire1.beginTransmission(MULTIPLEXER_ADDR);
+        Wire1.write(1 << channel);
+        return (Wire1.endTransmission() == 0);
+    }
+
+    Colors classifyColor(int sensor, float r, float g, float b, uint16_t lux)
+    {
+        // Find the dominant color
+        if (lux > whiteThreshold[sensor][modeIndex] * 0.6)
+        {
+            return WHITE;
+        }
+        else if (r > g + redToGreenOffset[sensor][modeIndex] * 0.8 && r > b + redToBlueOffset[sensor][modeIndex] * 0.8)
+        {
+            return RED;
+        }
+        else if (b > r + blueToRedOffset[sensor][modeIndex] * 0.6 && b > g + blueToGreenOffset[sensor][modeIndex] * 0.6)
+        {
+            return BLUE;
+        }
+        else if (lux < blackThreshold[sensor][modeIndex] * 1.5)
+        {
+            return BLACK;
+        }
+        return UNKNOWN; // consider unknown to be the colour of the background as in the interfaces of 2 colours it gives none of the above values
+    }
+
+    Colors classifyBlackWhite(int sensor, uint16_t lux)
+    {
+        if (lux > whiteThreshold[sensor][modeIndex] * 0.6)
+        {
+            return WHITE;
+        }
+        else if (lux < blackThreshold[sensor][modeIndex] * 1.5)
+        {
+            return BLACK;
+        }
+        return UNKNOWN;
     }
 
     void tofReset()
@@ -294,186 +361,5 @@ public:
                 Serial.printf("Failed to initialize sensor %d\n", t - 3);
             }
         }
-    }
-
-    bool calibrateSensors()
-    {
-        Colors currentColor = WHITE;
-        bool calibrationComplete = false;
-
-        Serial.println("Starting color sensor calibration...");
-        Serial.println("Place sensors on WHITE surface and press SW1");
-
-        while (!calibrationComplete)
-        {
-            int switchState = switches.switchRead(); // calibaration starts only if switch 1 is on.
-            // turn it off before it starts calibarating another color
-
-            if (switchState == 1)
-            {
-                switch (currentColor)
-                {
-                case WHITE:
-                    if (calibrateWhite())
-                    {
-                        currentColor = RED;
-                        Serial.println("WHITE calibrated. Place sensors on RED surface and press SW1");
-                    }
-                    break;
-
-                case RED:
-                    if (calibrateRed())
-                    {
-                        currentColor = BLUE;
-                        Serial.println("RED calibrated. Place sensors on BLUE surface and press SW1");
-                    }
-                    break;
-
-                case BLUE:
-                    if (calibrateBlue())
-                    {
-                        currentColor = BLACK;
-                        Serial.println("BLUE calibrated. Place sensors on BLACK surface and press SW1");
-                    }
-                    break;
-
-                case BLACK:
-                    if (calibrateBlack())
-                    {
-                        calibrationComplete = true;
-                        Serial.println("Calibration complete!");
-                    }
-                    break;
-                }
-            }
-            else if (switchState == 2)
-            { // SW2 pressed - abort calibration
-                Serial.println("Calibration aborted!");
-                return false;
-            }
-
-            delay(100); // Debounce delay
-        }
-
-        return true;
-    }
-
-private:
-    // Constants for calibration
-    static const int SAMPLES_PER_CALIBRATION = 100;
-    static const int CALIBRATION_DELAY_MS = 5;
-
-    int integration_time = TCS34725_FAST_INTEGRATION_TIME;
-    bool isFast = true;
-    int modeIndex = 0; // 0 for fast mode(default) , 1 for fast mode
-    // this index will be used to get values from the offset and threshold arrs
-
-    bool tofEnabled = true;
-    bool colourEnabled = true;
-
-    bool isWire1Init = false;
-    bool isWire0Init = false;
-
-    // Struct to hold RGB and Lux readings
-    struct ColorReading
-    {
-        float r_ratio;
-        float g_ratio;
-        float b_ratio;
-        uint16_t lux;
-    };
-
-    // Helper function to get average readings
-    ColorReading getAverageReading(int sensorIndex)
-    {
-        ColorReading total = {0, 0, 0, 0};
-        int validSamples = 0;
-
-        for (int i = 0; i < SAMPLES_PER_CALIBRATION; i++)
-        {
-            uint16_t r, g, b, c, lux;
-            selectChannel(sensorIndex + 3); // Adjust channel offset
-
-            colourSensorArr[sensorIndex]->getRawData(&r, &g, &b, &c);
-            if (c == 0 || r == 65535 || g == 65535 || b == 65535 || c == 65535)
-                continue; // Skip invalid readings
-
-            lux = colourSensorArr[sensorIndex]->calculateLux(r, g, b);
-
-            total.r_ratio += (float)r / c;
-            total.g_ratio += (float)g / c;
-            total.b_ratio += (float)b / c;
-            total.lux += lux;
-            validSamples++;
-
-            delay(CALIBRATION_DELAY_MS);
-        }
-
-        if (validSamples == 0)
-            return {0, 0, 0, 0};
-
-        return {
-            total.r_ratio / validSamples,
-            total.g_ratio / validSamples,
-            total.b_ratio / validSamples,
-            (uint16_t)(total.lux / validSamples)};
-    }
-
-    bool calibrateWhite()
-    {
-        for (int sensor = 0; sensor < 5; sensor++)
-        {
-            ColorReading reading = getAverageReading(sensor);
-            if (reading.lux == 0)
-                return false; // Invalid readings
-
-            // Store white threshold with some margin
-            whiteThreshold[sensor][modeIndex] = reading.lux * 0.5; // 90% of white reading
-        }
-        return true;
-    }
-
-    bool calibrateRed()
-    {
-        for (int sensor = 0; sensor < 5; sensor++)
-        {
-            ColorReading reading = getAverageReading(sensor);
-            if (reading.lux == 0)
-                return false;
-
-            // Store red-green and red-blue offsets
-            redToGreenOffset[sensor][modeIndex] = (reading.r_ratio - reading.g_ratio) * 0.7; // Red to green threshold
-            redToBlueOffset[sensor][modeIndex] = (reading.r_ratio - reading.b_ratio) * 0.7;  // Red to blue threshold
-        }
-        return true;
-    }
-
-    bool calibrateBlue()
-    {
-        for (int sensor = 0; sensor < 5; sensor++)
-        {
-            ColorReading reading = getAverageReading(sensor);
-            if (reading.lux == 0)
-                return false;
-
-            // Store blue-red and blue-green offsets
-            blueToRedOffset[sensor][modeIndex] = (reading.b_ratio - reading.r_ratio) * 0.5;   // Blue to red threshold
-            blueToGreenOffset[sensor][modeIndex] = (reading.b_ratio - reading.g_ratio) * 0.5; // Blue to green threshold
-        }
-        return true;
-    }
-
-    bool calibrateBlack()
-    {
-        for (int sensor = 0; sensor < 5; sensor++)
-        {
-            ColorReading reading = getAverageReading(sensor);
-            if (reading.lux == 0)
-                return false;
-
-            // Store black threshold with some margin
-            blackThreshold[sensor][modeIndex] = reading.lux * 1.5; // 150% of black reading
-        }
-        return true;
     }
 };
