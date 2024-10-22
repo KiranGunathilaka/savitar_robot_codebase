@@ -3,14 +3,19 @@
 #include "systick.h"
 #include "config.h"
 #include "switches.h"
+#include "sensors.h"
+#include "printer.h"
+#include "calibaration.h"
+#include "nvs.h"
 
 Motors motors;
 Encoders encoders;
 Sensors sensors;
 Systick systick;
 Switches switches;
-Time time;
+Printer printer;
 NVS nvs;
+Calibaration calibaration;
 
 
 void setup()
@@ -24,16 +29,16 @@ void setup()
 
   switches.enableSimulation(true); //will accept serial inputs as switch data (until switches are connected)
 
-  // systick.enableSlowMode(false);
-  // sensors.calibrateSensors();
-  // nvs.saveCalibrationData();
+  systick.enableSlowMode(false);
+  calibaration.calibrateSensors();
+  nvs.saveCalibrationData();
 
   // systick.enableSlowMode(true);
-  // sensors.calibrateSensors();
+  // calibaration.calibrateSensors();
   // nvs.saveCalibrationData();
 
   nvs.loadCalibrationData();
-  sensors.printCalibrationData();
+  printer.printCalibrationData();
 }
 
 void loop()

@@ -5,7 +5,7 @@
 #include "encoders.h"
 #include "sensors.h"
 #include "Ticker.h"
-#include "time.h"
+#include "printer.h"
 #include "config.h"
 
 class Systick;
@@ -17,9 +17,8 @@ private:
     double tickerTime = FAST_TICKER;
     bool slowMode = false;
     Ticker ticker;
-    
-public:
 
+public:
     bool isSlowModeEnabled()
     {
         return slowMode;
@@ -29,34 +28,37 @@ public:
     {
         ticker.attach(tickerTime, []()
                       {
-                        encoders.update();
-                        //motors.update();
-                        sensors.update();
+                          encoders.update();
+                          // motors.update();
+                          sensors.update();
 
-                        Serial.print(time.getTimeDiff());
-                        Serial.print("  ");
-                         });
+                          printer.printTimeDiff();
+                        //   printer.printTof();
+                        //   printer.printAllColors(true);
+                      });
     }
 
     void enableSlowMode(bool enable)
     {
-        if (enable != slowMode){
+        if (enable != slowMode)
+        {
             ticker.detach();
-            if (enable){
+            if (enable)
+            {
                 tickerTime = SLOW_TICKER;
                 sensors.enableFastMode(false);
                 begin();
                 Serial.print("Slow Mode");
             }
-            else{
+            else
+            {
                 tickerTime = FAST_TICKER;
                 sensors.enableFastMode(true);
                 begin();
                 Serial.print("Fast Mode");
             }
-            
+
             slowMode = enable;
         }
-        
     }
 };
