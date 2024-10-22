@@ -52,8 +52,8 @@ const float DEG_PER_MM_DIFFERENCE = 180.0 / (PI * WHEEL_GAP);
 #define MULTIPLEXER_ADDR 0x73
 #define TCS34725_ADDR 0x29
 
-#define TCS34725_FAST_INTEGRATION_TIME 0xFE // 2 cycles,  4.8 seconds for one sensor , delay 32ms
-#define TCS34725_SLOW_INTEGRATION_TIME 0xFC // 4 cycles,  9.6 seconds for one sensor , delay 57ms
+#define TCS34725_FAST_INTEGRATION_TIME 0xFF // 1 cycles,  4.8 seconds for one sensor , delay 25ms
+#define TCS34725_SLOW_INTEGRATION_TIME 0xFC // 4 cycles,  9.6 seconds for one sensor , delay 60ms
 
 const int ToF_XSHUT_Right = 9;
 const int ToF_XSHUT_Left = 10;
@@ -75,12 +75,12 @@ const float SENSOR_WEIGHTS[5] = {-2.0, -1.0, 0.0, 1.0, 2.0};
 //*************************************************************CALIBRATION******************************************
 
 static const int SAMPLES_PER_CALIBRATION = 100;
-static const int CALIBRATION_DELAY_MS = 5;
+static const int CALIBRATION_DELAY_MS = 0;
 //*************************************************************SWITCHES******************************************
 
 const int SWITCH_PIN = 7;
 
 //*************************************************************SYSTICK*******************************************
 
-#define FAST_TICKER 0.035
-#define SLOW_TICKER 0.059
+#define FAST_TICKER 0.025
+#define SLOW_TICKER 0.060

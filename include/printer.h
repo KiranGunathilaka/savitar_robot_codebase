@@ -14,7 +14,7 @@ public:
     int x = 0;
     int diff = 0;
 
-    void printTimeDiff(bool newLine = true)
+    void printTimeDiff(bool newLine = false)
     {
         Serial.print(millis() - x);
         if (newLine)

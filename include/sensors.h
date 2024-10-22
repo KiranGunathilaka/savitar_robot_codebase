@@ -13,13 +13,17 @@ extern Sensors sensors;
 class Sensors
 {
 private:
-
-
     int integration_time = TCS34725_FAST_INTEGRATION_TIME;
     bool isFast = true;
 
+    enum
+    {
+        FAST_MODE,
+        SLOW_MODE
+    };
+
     // 0 for fast mode(default - black n white) , 1 for slow mode (Colour follwing)-this index will be used to get values from the offset and threshold arrs
-    int modeIndex = 0;
+    int modeIndex = FAST_MODE;
 
     bool tofEnabled = true;
     bool colourEnabled = true;
@@ -27,7 +31,6 @@ private:
     bool isWire1Init = false;
     bool isWire0Init = false;
 
-    
     float last_steering_error = 0;
     float accumelated_steering_error = 0;
     volatile float cross_track_error;
@@ -40,7 +43,6 @@ public:
 
     const int tofOffset[5] = {-10, -16, -10, -15, -10}; // adjust these values
 
-
     enum Colors
     {
         WHITE,
@@ -51,8 +53,8 @@ public:
     };
 
     Adafruit_TCS34725 *colourSensorArr[5];
-    bool sensorsOnLine[5] = {false, false, false, false, false}; //stores whether each sensor detected the currently following color
-    Colors sensorColors[5] = {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN}; 
+    bool sensorsOnLine[5] = {false, false, false, false, false}; // stores whether each sensor detected the currently following color
+    Colors sensorColors[5] = {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN};
 
     int whiteThreshold[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
     float redToGreenOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
@@ -83,8 +85,6 @@ public:
         colourSensorReset();
 
         tofReset();
-
-        enableFastMode(true);
     }
 
     // to swtich between colour sensor 2 cycle mode and 4 cycle mode
@@ -94,17 +94,18 @@ public:
 
         if (!isFast)
         {
-            modeIndex = 1;
+            modeIndex = SLOW_MODE;
             integration_time = TCS34725_SLOW_INTEGRATION_TIME;
         }
         else
         {
-            modeIndex = 0;
+            modeIndex = FAST_MODE;
             integration_time = TCS34725_FAST_INTEGRATION_TIME;
         }
     }
 
-    int getModeIndex(){
+    int getModeIndex()
+    {
         return modeIndex;
     }
 
@@ -204,7 +205,7 @@ public:
                 float b_ratio = (float)b / c;
 
                 Colors color = sensors.classifyColor(t - 3, r_ratio, g_ratio, b_ratio, lux);
-                sensorColors[t-3] = color;
+                sensorColors[t - 3] = color;
 
                 // Serial.printf(" r: %f g: %f b: %f c: %d lux:%d ", r_ratio, g_ratio, b_ratio, c, lux);
 
@@ -236,7 +237,7 @@ public:
     Colors classifyColor(int sensor, float r, float g, float b, uint16_t lux)
     {
         // Find the dominant color
-        if (lux > whiteThreshold[sensor][modeIndex] * 0.6)
+        if (lux > whiteThreshold[sensor][modeIndex] * 0.61)
         {
             return WHITE;
         }
@@ -248,7 +249,7 @@ public:
         {
             return BLUE;
         }
-        else if (lux < blackThreshold[sensor][modeIndex] * 1.5)
+        else if (lux < blackThreshold[sensor][modeIndex] * 1.4)
         {
             return BLACK;
         }
@@ -354,11 +355,11 @@ public:
 
             if (colourSensorArr[t - 3]->begin(TCS34725_ADDRESS, &Wire1))
             {
-                Serial.printf("Sensor %d initialized successfully\n", t - 3);
+                Serial.printf("Sensor %d initialized successfully\n", t - 2);
             }
             else
             {
-                Serial.printf("Failed to initialize sensor %d\n", t - 3);
+                Serial.printf("Failed to initialize sensor %d\n", t - 2);
             }
         }
     }

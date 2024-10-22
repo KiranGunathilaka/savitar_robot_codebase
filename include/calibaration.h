@@ -104,7 +104,7 @@ public:
             total.lux += lux;
             validSamples++;
 
-            delay(CALIBRATION_DELAY_MS);
+            //delay(CALIBRATION_DELAY_MS);
         }
 
         if (validSamples == 0)

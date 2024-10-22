@@ -33,9 +33,9 @@ void setup()
   calibaration.calibrateSensors();
   nvs.saveCalibrationData();
 
-  systick.enableSlowMode(true);
-  calibaration.calibrateSensors();
-  nvs.saveCalibrationData();
+  // systick.enableSlowMode(true);
+  // calibaration.calibrateSensors();
+  // nvs.saveCalibrationData();
 
   nvs.loadCalibrationData();
   printer.printCalibrationData();
