@@ -3,7 +3,9 @@
 #include <Arduino.h>
 #include "sensors.h"
 #include "encoders.h"
-// Do not call this function inside the sensors, encoders class as it will result in circular dependency error
+#include "motors.h"
+// Do not call this function inside the sensors, encoders, motors classes as it will result in circular dependency error
+// And call them always after the update functions as it will print the immediate correct values
 
 class Printer;
 extern Printer printer;
@@ -171,7 +173,7 @@ public:
 
     void printEncoderCounts(bool newline)
     {
-        Serial.print("Left_Back: ");
+        Serial.print("Encoder Countns || Left_Back: ");
         Serial.print(encoders.tempLeftBack);
         Serial.print("| Left_Front: ");
         Serial.print(encoders.tempLeftFront);
@@ -179,6 +181,42 @@ public:
         Serial.print(encoders.tempRightBack);
         Serial.print("| Right_Front: ");
         Serial.print(encoders.tempRightFront);
+
+        if (newline)
+        {
+            Serial.print("\n");
+        }
+        else
+        {
+            Serial.print("  ");
+        }
+    }
+
+    void printMotorFeedPercentages(bool newline)
+    {
+        Serial.print("Motor percentages || Left_Back: ");
+        Serial.print(motors.left_back_motor_percentage);
+        Serial.print("| Left_Front: ");
+        Serial.print(motors.left_front_motor_percentage);
+        Serial.print("| Right_Back: ");
+        Serial.print(motors.right_front_motor_percentage);
+        Serial.print("| Right_Front: ");
+        Serial.print(motors.right_front_motor_percentage);
+
+        if (newline)
+        {
+            Serial.print("\n");
+        }
+        else
+        {
+            Serial.print("  ");
+        }
+    }
+
+    void printSteeringAdjustment(bool newline)
+    {
+        Serial.print("Seteering adjust : ");
+        Serial.print(sensors.get_steering_adjustment());
 
         if (newline)
         {

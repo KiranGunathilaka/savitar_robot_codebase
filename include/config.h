@@ -40,6 +40,26 @@ const float WHEEL_GAP = 108;                       // distance between the wheel
 const float MM_PER_ROTATION = WHEEL_DIAMETER * PI; //  pi*wheel diameter .......d=33mm
 const float DEG_PER_MM_DIFFERENCE = 180.0 / (PI * WHEEL_GAP);
 
+const float FWD_KP = 1.0;
+const float FWD_KD = 1.0;
+const float ROT_KP = 1.0;
+const float ROT_KD = 1.0;
+
+const int ROBOT_RADIUS = 115; //measure it to the absolute 1mm accuracy
+const float RADIANS_PER_DEGREE = PI / 180; 
+
+const int PWM_RESOLUTION = 8;
+
+const int MIN_MOTOR_BIAS = 15;
+const int MAX_MOTOR_PERCENTAGE = 85;
+const int MIN_MOTOR_PERCENTAGE = 10; // when the given percentage is below this value, percentage is set to zero to damp oscillations
+//find this value for the all 4 motors and set the maximum from them here
+
+//change motor directions to make the motors spin forward when both motors are forward commanded (for use of incorrect wiring)
+#define MOTOR_LEFT_BACK_POLARITY (1)
+#define MOTOR_RIGHT_BACK_POLARITY (1)
+#define MOTOR_LEFT_FRONT_POLARITY (1)
+#define MOTOR_RIGHT_FRONT_POLARITY (1)
 //**********************************************************Sensors**********************************************************
 
 // I2C Pins for ESP32
