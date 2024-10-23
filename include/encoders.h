@@ -6,12 +6,17 @@
 #include <math.h>
 
 class Encoders;
-
 extern Encoders encoders;
 
 class Encoders
 {
 public:
+    long tempLeftBack;
+    long tempLeftFront;
+    long tempRightBack;
+    long tempRightFront;
+
+
     void begin()
     {
         pinMode(LeftBackEncoderPin1, INPUT_PULLUP); // can speed up gpio readtime by using gpio config(driver/gpio.h)
@@ -21,7 +26,7 @@ public:
         pinMode(RightBackEncoderPin2, INPUT_PULLUP);
 
         pinMode(LeftFrontEncoderPin1, INPUT_PULLUP);
-        pinMode(LeftBackEncoderPin2, INPUT_PULLUP);
+        pinMode(LeftFrontEncoderPin2, INPUT_PULLUP);
 
         pinMode(RightFrontEncoderPin1, INPUT_PULLUP);
         pinMode(RightFrontEncoderPin2, INPUT_PULLUP);
@@ -161,32 +166,38 @@ public:
         lastEncodedRightFront = encoded; // Save the current state
     }
 
-    
-
     void update()
     {
-        unsigned long currentTime = micros();
+        unsigned long currentTime = micros(); // this overflows after 70 mins
 
-        left_delta = 0;
-        right_delta = 0;
+        left_delta = 0.0;
+        right_delta = 0.0;
 
-        // time_change_2 = time_change_1;
-        time_change_1 = prevTime;
-        time_change_u = currentTime - prevTime; // (time_change_1+time_change_2)/2;
-        if (time_change_u == 0)
+        time_change_us_temp = prevTime;
+        time_change_us = currentTime - prevTime;
+        if (time_change_us == 0) // if the time is negligible between interupts (This doesn't occur now as ticker is used to update instead of the loop, but just in case)
         {
-            time_change_u = 1;
+            time_change_us = 1;
         }
 
         prevTime = currentTime;
 
-        // Make sure values don't change while being read. Be quick.
+        // Make sure values don't change while being read.
         noInterrupts();
-        left_delta = encoderCounterLeftBack;
-        right_delta = encoderCounterRightBack;
+        tempLeftBack = encoderCounterLeftBack;
+        tempLeftFront = encoderCounterLeftFront;
+        tempRightBack = encoderCounterRightBack;
+        tempRightFront = encoderCounterRightFront;
+
         encoderCounterLeftBack = 0;
+        encoderCounterLeftFront = 0;
         encoderCounterRightBack = 0;
+        encoderCounterRightFront = 0;
         interrupts();
+
+        // doing floating point math outside critical section after making them interrupt-safe
+        left_delta = (tempLeftBack + tempLeftFront) * 0.5;
+        right_delta = (tempRightBack + tempRightFront) * 0.5;
 
         float left_change = (float)left_delta * MM_PER_ROTATION / PULSES_PER_ROTATION;
         float right_change = (float)right_delta * MM_PER_ROTATION / PULSES_PER_ROTATION;
@@ -199,13 +210,13 @@ public:
 
     inline int loopTime_us()
     {
-        int looptime = time_change_u;
+        int looptime = time_change_us;
         return looptime;
     }
 
     inline float loopTime_s()
     {
-        float time = (float)time_change_u / 1000000.0;
+        float time = (float)time_change_us / 1000000.0;
         return time;
     }
 
@@ -236,7 +247,7 @@ public:
         float speed;
 
         noInterrupts();
-        speed = (fwd_change / time_change_u) * 1000000;
+        speed = (fwd_change / time_change_us) * 1000000;
         interrupts();
 
         return speed;
@@ -247,7 +258,7 @@ public:
         float omega;
 
         noInterrupts();
-        omega = (rot_change / time_change_u) * 1000000;
+        omega = (rot_change / time_change_us) * 1000000;
         interrupts();
 
         return omega;
@@ -280,7 +291,7 @@ public:
         int rps;
 
         noInterrupts();
-        rps = (left_delta / time_change_u) * 1000000; // encoderCounterLeft *
+        rps = (left_delta / time_change_us) * 1000000;
         interrupts();
 
         return rps;
@@ -291,37 +302,37 @@ public:
         int rps;
 
         noInterrupts();
-        rps = (right_delta / time_change_u) * 1000000;
+        rps = (right_delta / time_change_us) * 1000000;
         interrupts();
 
         return rps;
     }
 
 private:
-    int left_delta; // this variable holds the number of encoder counts during two update calls
-    int right_delta;
-
     volatile long encoderCounterLeftBack; // Encoder roatation count, this gets reset every time we call update
     volatile long lastEncodedLeftBack;    // Last encoded value
 
     volatile long encoderCounterRightBack;
     volatile long lastEncodedRightBack;
 
-    volatile long encoderCounterRightFront; 
+    volatile long encoderCounterRightFront;
     volatile long lastEncodedRightFront;
 
-    volatile long encoderCounterLeftFront; 
-    volatile long lastEncodedLeftFront;    
+    volatile long encoderCounterLeftFront;
+    volatile long lastEncodedLeftFront;
 
     volatile float robot_distance; // the complete distance travel by robot, this get's incremented using the update function
     volatile float robot_angle;    // same like above
 
     unsigned long prevTime;
+    
     // the change in distance or angle in the last tick.
-    float fwd_change; // difference
+    float fwd_change;
     float rot_change;
-    float time_change_u;
-    int time_change_1;
-    int time_change_2;
-    int time_change_3;
+
+    float left_delta; // this variable holds the number of encoder counts during two update calls
+    float right_delta;
+
+    int time_change_us;
+    int time_change_us_temp;
 };

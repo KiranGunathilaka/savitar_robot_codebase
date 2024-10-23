@@ -26,14 +26,6 @@ private:
   unsigned long i = 0;
 
 public:
-  // remove after testing
-
-  // float fwdKp = FWD_KP_SMALL;
-  // float fwdKd = FWD_KD_SMALL;
-  // float rotKp = ROT_KP_90;
-  // float rotKd = ROT_KD_90;
-
-  // // remove
 
   void begin()
   {

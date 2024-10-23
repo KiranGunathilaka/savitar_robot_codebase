@@ -2,8 +2,8 @@
 
 #include <Arduino.h>
 #include "sensors.h"
-//Do not call this function inside the sensors class as it will result in circular dependency error
-
+#include "encoders.h"
+// Do not call this function inside the sensors, encoders class as it will result in circular dependency error
 
 class Printer;
 extern Printer printer;
@@ -23,7 +23,7 @@ public:
         }
         else
         {
-            Serial.print(" ");
+            Serial.print("  ");
         }
         x = millis();
     }
@@ -116,11 +116,14 @@ public:
         Serial.print(sensors.center_bottom_tof);
         Serial.print(" ");
         Serial.print(sensors.center_top_tof);
-        Serial.print("    ");
 
         if (newline)
         {
             Serial.print("\n");
+        }
+        else
+        {
+            Serial.print("  ");
         }
     }
 
@@ -159,6 +162,31 @@ public:
         if (newline)
         {
             Serial.print("\n");
+        }
+        else
+        {
+            Serial.print(" ");
+        }
+    }
+
+    void printEncoderCounts(bool newline)
+    {
+        Serial.print("Left_Back: ");
+        Serial.print(encoders.tempLeftBack);
+        Serial.print("| Left_Front: ");
+        Serial.print(encoders.tempLeftFront);
+        Serial.print("| Right_Back: ");
+        Serial.print(encoders.tempRightBack);
+        Serial.print("| Right_Front: ");
+        Serial.print(encoders.tempRightFront);
+
+        if (newline)
+        {
+            Serial.print("\n");
+        }
+        else
+        {
+            Serial.print("  ");
         }
     }
 };

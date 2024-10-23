@@ -30,8 +30,8 @@ void setup()
   switches.enableSimulation(true); //will accept serial inputs as switch data (until switches are connected)
 
   systick.enableSlowMode(false);
-  calibaration.calibrateSensors();
-  nvs.saveCalibrationData();
+  // calibaration.calibrateSensors();
+  // nvs.saveCalibrationData();
 
   // systick.enableSlowMode(true);
   // calibaration.calibrateSensors();
