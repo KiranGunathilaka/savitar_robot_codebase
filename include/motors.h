@@ -10,23 +10,33 @@ extern Motors motors;
 class Motors
 {
 private:
-  float m_previous_fwd_error;
-  float m_previous_rot_error;
-  float m_fwd_error;
-  float m_rot_error;
+  float previous_fwd_error_back;
+  float previous_rot_error_back;
+  float fwd_error_back;
+  float rot_error_back;
 
-  float m_velocity;
-  float m_omega;
+  float previous_fwd_error_front;
+  float previous_rot_error_front;
+  float fwd_error_front;
+  float rot_error_front;
 
-  bool m_feedforward_enabled = true;
-  bool m_controller_output_enabled;
+  float velocity;
+  float omega;
+
+  bool feedforward_enabled = true;
+  bool controller_output_enabled;
 
 public:
   // remove this after testing
-  float fwdKp = FWD_KP;
-  float fwdKd = FWD_KD;
-  float rotKp = ROT_KP;
-  float rotKd = ROT_KD;
+  float fwdKpBack = FWD_KP_BACK;
+  float fwdKdBack = FWD_KD_BACK;
+  float rotKpBack = ROT_KP_BACK;
+  float rotKdBack = ROT_KD_BACK;
+
+  float fwdKpFront = FWD_KP_FRONT;
+  float fwdKdFront = FWD_KD_FRONT;
+  float rotKpFront = ROT_KP_FRONT;
+  float rotKdFront = ROT_KD_FRONT;
 
   float left_back_motor_percentage;
   float right_back_motor_percentage;
@@ -80,20 +90,20 @@ public:
 
   void reset_controllers()
   {
-    m_fwd_error = 0;
-    m_rot_error = 0;
-    m_previous_fwd_error = 0;
-    m_previous_rot_error = 0;
+    fwd_error_back = 0;
+    rot_error_back = 0;
+    previous_fwd_error_back = 0;
+    previous_rot_error_back = 0;
   }
 
   void enable_controllers()
   {
-    m_controller_output_enabled = true;
+    controller_output_enabled = true;
   }
 
   void disable_controllers()
   {
-    m_controller_output_enabled = false;
+    controller_output_enabled = false;
   }
 
   void stop()
@@ -104,78 +114,166 @@ public:
     set_right_front_motor_percentage(0);
   }
 
-  float position_controller()
+  float position_controller_front()
   {
-    float increment = m_velocity * encoders.loopTime_s();
-    m_fwd_error += increment - encoders.robot_fwd_change();
-    float diff = m_fwd_error - m_previous_fwd_error;
-    m_previous_fwd_error = m_fwd_error;
+    float increment = velocity * encoders.getLoopTime();
+    fwd_error_front += increment - encoders.robot_fwd_change_front();
+    float diff = fwd_error_front - previous_fwd_error_front;
+    previous_fwd_error_front = fwd_error_front;
 
     // change them to config kp kd later
-    float output = fwdKp * m_fwd_error + fwdKd * diff;
+    float output = fwdKpFront * fwd_error_front + fwdKdFront * diff;
     return output;
   }
 
-  float angle_controller(float steering_adjustment)
+  float angle_controller_front(float steering_adjustment)
   {
-    float increment = m_omega * encoders.loopTime_s();
-    m_rot_error += increment - encoders.robot_rot_change();
-    float diff = m_rot_error - m_previous_rot_error;
-    m_previous_rot_error = m_rot_error;
+    float increment = omega * encoders.getLoopTime();
+    rot_error_front += increment - encoders.robot_rot_change_front();
+    float diff = rot_error_front - previous_rot_error_front;
+    previous_rot_error_front = rot_error_front;
 
-    m_rot_error -= steering_adjustment;
+    rot_error_front -= steering_adjustment;
 
     // changethis kp kd to config kp kd later
-    float output = rotKp * m_rot_error + rotKd * diff;
+    float output = rotKpFront * rot_error_front + rotKdFront * diff;
     return output;
   }
 
-  //feed forward functions gives the percentage required to acheive a given velocity
-  float left_feed_forward_percentage(float left_feed_velocity)
+  float position_controller_back()
   {
-    int l_rps = (left_feed_velocity * PULSES_PER_ROTATION) / MM_PER_ROTATION;
+    float increment = velocity * encoders.getLoopTime();
+    fwd_error_back += increment - encoders.robot_fwd_change_back();
+    float diff = fwd_error_back - previous_fwd_error_back;
+    previous_fwd_error_back = fwd_error_back;
 
-    float l_feed_percentage = 289.6 - sqrt(-6.329 * l_rps + 85635.1);
+    // change them to config kp kd later
+    float output = fwdKpBack * fwd_error_back + fwdKdBack * diff;
+    return output;
+  }
+
+  float angle_controller_back(float steering_adjustment)
+  {
+    float increment = omega * encoders.getLoopTime();
+    rot_error_back += increment - encoders.robot_rot_change_back();
+    float diff = rot_error_back - previous_rot_error_back;
+    previous_rot_error_back = rot_error_back;
+
+    rot_error_back -= steering_adjustment;
+
+    // changethis kp kd to config kp kd later
+    float output = rotKpBack * rot_error_back + rotKdBack * diff;
+    return output;
+  }
+
+  // feed forward functions gives the percentage required to acheive a given velocity
+  float left_front_feed_forward_percentage(float left_front_feed_velocity)
+  {
+    int l_rps = (left_front_feed_velocity * PULSES_PER_ROTATION) / MM_PER_ROTATION_FRONT;
+    float l_feed_percentage;
+    if (l_rps >= 0)
+    {
+      l_feed_percentage = 0.020475 * l_rps - 1.37122;
+    }
+    else
+    {
+      l_feed_percentage = 0.020283 * l_rps + 3.09038;
+    }
+
     return l_feed_percentage;
   }
 
-  float right_feed_forward_percentage(float left_feed_velocity)
+  float right_front_feed_forward_percentage(float right_front_feed_velocity)
   {
-    int r_rps = (left_feed_velocity * PULSES_PER_ROTATION) / MM_PER_ROTATION;
+    int r_rps = (right_front_feed_velocity * PULSES_PER_ROTATION) / MM_PER_ROTATION_FRONT;
 
-    float r_feed_percentage = 289.6 - sqrt(-6.329 * r_rps + 85635.1);
+    float r_feed_percentage;
+    if (r_rps >= 0)
+    {
+      r_feed_percentage = 0.020379 * r_rps - 1.18911;
+    }
+    else
+    {
+      r_feed_percentage = 0.020743 * r_rps + 2.71375;
+    }
+
     return r_feed_percentage;
   }
 
-
-
-  void update(float velocity, float omega, float steering)
+  float left_back_feed_forward_percentage(float left_back_feed_velocity)
   {
-    m_velocity = velocity;
-    m_omega = omega;
+    int l_rps = (left_back_feed_velocity * PULSES_PER_ROTATION) / MM_PER_ROTATION_BACK;
 
-    float pos_output = position_controller();
-    float rot_output = angle_controller(steering);
+    float l_feed_percentage;
+    if (l_rps >= 0)
+    {
+      l_feed_percentage = 0.020792 * l_rps - 2.53192;
+    }
+    else
+    {
+      l_feed_percentage = 0.020412 * l_rps + 3.75929;
+    }
+
+    return l_feed_percentage;
+  }
+
+  float right_back_feed_forward_percentage(float right_back_feed_velocity)
+  {
+    int r_rps = (right_back_feed_velocity * PULSES_PER_ROTATION) / MM_PER_ROTATION_BACK;
+
+    float r_feed_percentage;
+    if (r_rps >= 0)
+    {
+      r_feed_percentage = 0.019446 * r_rps - 2.51284;
+    }
+    else
+    {
+      r_feed_percentage = 0.020861 * r_rps + 4.46584;
+    }
+
+    return r_feed_percentage;
+  }
+
+  void update(float vel, float omg, float steering)
+  {
+    velocity = vel;
+    omega = omg;
+
+    // common parameters for both front and back pairs
+    float tangent_speed = omega * ROBOT_RADIUS * RADIANS_PER_DEGREE;
+    float left_speed = velocity - tangent_speed;
+    float right_speed = velocity + tangent_speed;
+
+    // pair-wise calculation for two pairs of motors
+    float pos_output_back = position_controller_back();
+    float rot_output_back = angle_controller_back(steering);
+    float pos_output_front = position_controller_front();
+    float rot_output_front = angle_controller_front(steering);
 
     float left_back_output = 0;
     float right_back_output = 0;
     float left_front_output = 0;
     float right_front_output = 0;
 
-    left_back_output = pos_output - rot_output;
-    right_back_output = pos_output + rot_output;
+    left_back_output = pos_output_back - rot_output_back;
+    right_back_output = pos_output_back + rot_output_back;
+    left_front_output = pos_output_front - rot_output_front;
+    right_front_output = pos_output_front + rot_output_front;
 
-    float tangent_speed = m_omega * ROBOT_RADIUS * RADIANS_PER_DEGREE;
-    float left_speed = m_velocity - tangent_speed;
-    float right_speed = m_velocity + tangent_speed;
-    float left_ff = left_feed_forward_percentage(left_speed);
-    float right_ff = right_feed_forward_percentage(right_speed);
-    if (m_feedforward_enabled)
+    float left_back_ff = left_back_feed_forward_percentage(left_speed);
+    float right_back_ff = right_back_feed_forward_percentage(right_speed);
+    float left_front_ff = left_front_feed_forward_percentage(left_speed);
+    float right_front_ff = right_front_feed_forward_percentage(right_speed);
+
+    if (feedforward_enabled)
     {
-      left_back_output += left_ff;
-      right_back_output += right_ff;
+      left_back_output += left_back_ff;
+      right_back_output += right_back_ff;
+      left_front_output += left_front_ff;
+      right_front_output += right_front_ff;
     }
-    if (m_controller_output_enabled)
+
+    if (controller_output_enabled)
     {
       set_left_back_motor_percentage(left_back_output);
       set_right_back_motor_percentage(right_back_output);
@@ -184,8 +282,6 @@ public:
     }
   }
 
-
-
   void set_left_back_motor_percentage(float percentage)
   {
     percentage = constrainPercentage(percentage);
@@ -193,7 +289,6 @@ public:
     left_back_motor_percentage = percentage;
     int left_pwm = calculate_pwm(percentage);
     set_left_back_motor_pwm(left_pwm);
-
   }
 
   void set_right_back_motor_percentage(float percentage)
@@ -203,7 +298,6 @@ public:
     right_back_motor_percentage = percentage;
     int right_pwm = calculate_pwm(percentage);
     set_right_back_motor_pwm(right_pwm);
-
   }
 
   void set_left_front_motor_percentage(float percentage)
@@ -224,27 +318,26 @@ public:
     set_right_front_motor_pwm(right_pwm);
   }
 
-  //limits the given percentage to minimum bias and maximum value (needs to overcome motor inequalities at lower pwm, 
-  //friction and give headroom for PID values to adjust in the higher edge)
+  // limits the given percentage to minimum bias and maximum value (needs to overcome motor inequalities at lower pwm,
+  // friction and give headroom for PID values to adjust in the higher edge)
   float constrainPercentage(float percentage)
   {
     percentage = constrain(percentage, -MAX_MOTOR_PERCENTAGE, MAX_MOTOR_PERCENTAGE);
     if (percentage > MIN_MOTOR_PERCENTAGE)
     {
-      percentage = map(percentage, MIN_MOTOR_PERCENTAGE, MAX_MOTOR_PERCENTAGE, MIN_MOTOR_BIAS, MAX_MOTOR_PERCENTAGE);
+      percentage = map(percentage, MIN_MOTOR_PERCENTAGE, MAX_MOTOR_PERCENTAGE, MIN_MOTOR_BIAS, MAX_MOTOR_REACH);
     }
     else if (percentage < -MIN_MOTOR_PERCENTAGE)
     {
-      percentage = map(percentage, -MAX_MOTOR_PERCENTAGE, -MIN_MOTOR_PERCENTAGE, -MAX_MOTOR_PERCENTAGE, -MIN_MOTOR_BIAS);
+      percentage = map(percentage, -MAX_MOTOR_PERCENTAGE, -MIN_MOTOR_PERCENTAGE, -MAX_MOTOR_REACH, -MIN_MOTOR_BIAS);
     }
-    else if (-MIN_MOTOR_PERCENTAGE <= percentage <= MIN_MOTOR_PERCENTAGE)
+    else if (percentage >= -MIN_MOTOR_PERCENTAGE && percentage <= MIN_MOTOR_PERCENTAGE)
     {
       percentage = 0;
     }
 
     return percentage;
   }
-
 
   // sets pwm values and directions by these seperate functions for each motor
   void set_left_back_motor_pwm(int pwm)
@@ -319,5 +412,25 @@ public:
   {
     int pwm = MAX_MOTOR_PERCENTAGE * PWM_RESOLUTION * desired_percentage / 10000;
     return pwm;
+  }
+
+  //mainly for using in the calibration class
+  void coast()
+  {
+    // Set the control pins for each motor to LOW, allowing them to coast
+    digitalWrite(LEFT_BACK_MOTOR_IN1, LOW);
+    digitalWrite(LEFT_BACK_MOTOR_IN2, LOW);
+    digitalWrite(RIGHT_BACK_MOTOR_IN1, LOW);
+    digitalWrite(RIGHT_BACK_MOTOR_IN2, LOW);
+    digitalWrite(LEFT_FRONT_MOTOR_IN1, LOW);
+    digitalWrite(LEFT_FRONT_MOTOR_IN2, LOW);
+    digitalWrite(RIGHT_FRONT_MOTOR_IN1, LOW);
+    digitalWrite(RIGHT_FRONT_MOTOR_IN2, LOW);
+
+    // Set PWM to 0 for all motors to ensure no active power is applied
+    ledcWrite(0, 0);
+    ledcWrite(1, 0);
+    ledcWrite(2, 0);
+    ledcWrite(3, 0);
   }
 };

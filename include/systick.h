@@ -26,17 +26,23 @@ public:
 
     void begin()
     {
+        encoders.setLoopTime(tickerTime);
         ticker.attach(tickerTime, []()
                       {
-                            encoders.update();
-                            //motors.update();
-                            sensors.update();
+                          encoders.update();
+                          //motors.update();
+                          //sensors.update();
 
-                            printer.printTimeDiff();
-                            printer.printTof();
-                            //printer.printAllColors(true); 
-                            printer.printEncoderCounts();
-                        });
+                          // printer.printTimeDiff();
+                          // printer.printTof();
+                          // printer.printAllColors();
+                          // printer.printEncoderCounts();
+                      });
+    }
+
+    float getLoopTime()
+    {
+        return tickerTime;
     }
 
     void enableSlowMode(bool enable)
@@ -48,17 +54,16 @@ public:
             {
                 tickerTime = SLOW_TICKER;
                 sensors.enableFastMode(false);
-                begin();
-                Serial.print("Slow Mode");
+                Serial.println("Slow Mode");
             }
             else
             {
                 tickerTime = FAST_TICKER;
                 sensors.enableFastMode(true);
-                begin();
-                Serial.print("Fast Mode");
+                Serial.println("Fast Mode");
             }
 
+            begin();
             slowMode = enable;
         }
     }

@@ -158,7 +158,7 @@ public:
         float dTerm = steering_kd * (cross_track_error - last_steering_error);
         float iTerm = steering_ki * (accumelated_steering_error);
 
-        float adjustment = (pTerm + dTerm + iTerm) * encoders.loopTime_s();
+        float adjustment = (pTerm + dTerm + iTerm) * encoders.getLoopTime();
 
         last_steering_error = cross_track_error;
         steering_adjustment = adjustment;

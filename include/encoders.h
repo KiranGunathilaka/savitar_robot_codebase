@@ -11,11 +11,10 @@ extern Encoders encoders;
 class Encoders
 {
 public:
-    long tempLeftBack;
-    long tempLeftFront;
+    long tempLeftBack;  // these values will be accessed by printer class for serial print
+    long tempLeftFront; // directly taking values from variables that are getting written by interrupts may crash the program
     long tempRightBack;
     long tempRightFront;
-
 
     void begin()
     {
@@ -46,14 +45,28 @@ public:
         reset();
     }
 
+    void setLoopTime(float time){
+        loopTime = time;
+    };
+
+    float getLoopTime(){
+        return loopTime;
+    };
+
+
     void reset()
     {
         noInterrupts();
 
         encoderCounterLeftBack = 0;
         encoderCounterRightBack = 0;
-        robot_distance = 0;
-        robot_angle = 0;
+        encoderCounterLeftFront = 0;
+        encoderCounterRightFront = 0;
+
+        robot_distance_back = 0;
+        robot_angle_back = 0;
+        robot_distance_front = 0;
+        robot_angle_front = 0;
 
         interrupts();
     }
@@ -168,26 +181,17 @@ public:
 
     void update()
     {
-        unsigned long currentTime = micros(); // this overflows after 70 mins
-
-        left_delta = 0.0;
-        right_delta = 0.0;
-
-        time_change_us_temp = prevTime;
-        time_change_us = currentTime - prevTime;
-        if (time_change_us == 0) // if the time is negligible between interupts (This doesn't occur now as ticker is used to update instead of the loop, but just in case)
-        {
-            time_change_us = 1;
-        }
-
-        prevTime = currentTime;
+        left_delta_back = 0;
+        right_delta_back = 0;
+        left_delta_front = 0;
+        right_delta_front = 0;
 
         // Make sure values don't change while being read.
         noInterrupts();
-        tempLeftBack = encoderCounterLeftBack;
-        tempLeftFront = encoderCounterLeftFront;
-        tempRightBack = encoderCounterRightBack;
-        tempRightFront = encoderCounterRightFront;
+        left_delta_back = encoderCounterLeftBack;
+        left_delta_front = encoderCounterLeftFront;
+        right_delta_back = encoderCounterRightBack;
+        right_delta_front = encoderCounterRightFront;
 
         encoderCounterLeftBack = 0;
         encoderCounterLeftFront = 0;
@@ -195,114 +199,202 @@ public:
         encoderCounterRightFront = 0;
         interrupts();
 
-        // doing floating point math outside critical section after making them interrupt-safe
-        left_delta = (tempLeftBack + tempLeftFront) * 0.5;
-        right_delta = (tempRightBack + tempRightFront) * 0.5;
+        // for serial print
+        tempLeftBack = left_delta_back;
+        tempLeftFront = left_delta_front;
+        tempRightBack = right_delta_back;
+        tempRightFront = right_delta_front;
 
-        float left_change = (float)left_delta * MM_PER_ROTATION / PULSES_PER_ROTATION;
-        float right_change = (float)right_delta * MM_PER_ROTATION / PULSES_PER_ROTATION;
+        float left_change_back = (float)left_delta_back * MM_PER_ROTATION_BACK / PULSES_PER_ROTATION;
+        float right_change_back = (float)right_delta_back * MM_PER_ROTATION_BACK / PULSES_PER_ROTATION;
+        float left_change_front = (float)left_delta_front * MM_PER_ROTATION_FRONT / PULSES_PER_ROTATION;
+        float right_change_front = (float)right_delta_front * MM_PER_ROTATION_FRONT / PULSES_PER_ROTATION;
 
-        fwd_change = 0.5 * (right_change + left_change); // taking average, distance in millimeters
-        robot_distance += fwd_change;
-        rot_change = (right_change - left_change) * DEG_PER_MM_DIFFERENCE;
-        robot_angle += rot_change;
+        fwd_change_back = 0.5 * (right_change_back + left_change_back); // taking average, distance in millimeters
+        robot_distance_back += fwd_change_back;
+        rot_change_back = (right_change_back - left_change_back) * DEG_PER_MM_DIFFERENCE;
+        robot_angle_back += rot_change_back;
+
+        fwd_change_front = 0.5 * (right_change_front + left_change_front); // taking average, distance in millimeters
+        robot_distance_front += fwd_change_front;
+        rot_change_front = (right_change_front - left_change_front) * DEG_PER_MM_DIFFERENCE;
+        robot_angle_front += rot_change_front;
     }
 
-    inline int loopTime_us()
-    {
-        int looptime = time_change_us;
-        return looptime;
-    }
 
-    inline float loopTime_s()
-    {
-        float time = (float)time_change_us / 1000000.0;
-        return time;
-    }
-
-    inline float robotDistance()
+    // back pair values
+    inline float robotDistanceBack()
     {
         float distance;
 
         noInterrupts();
-        distance = robot_distance; // in mm
+        distance = robot_distance_back; // in mm
         interrupts();
 
         return distance;
     }
 
-    inline float robotAngle()
+    inline float robotAngleBack()
     {
         float angle;
 
         noInterrupts();
-        angle = robot_angle;
+        angle = robot_angle_back;
         interrupts();
 
         return angle;
     }
 
-    inline float robot_speed()
+    inline float robot_speed_back()
     {
         float speed;
 
         noInterrupts();
-        speed = (fwd_change / time_change_us) * 1000000;
+        speed = ((float) fwd_change_back / loopTime);
         interrupts();
 
         return speed;
     }
 
-    inline float robot_omega()
+    inline float robot_omega_back()
     { /////given in degrees per second!!!!!
         float omega;
 
         noInterrupts();
-        omega = (rot_change / time_change_us) * 1000000;
+        omega = ((float) rot_change_back / loopTime);
         interrupts();
 
         return omega;
     }
 
-    inline float robot_fwd_change()
+    inline float robot_fwd_change_back()
     {
         float distance;
 
         noInterrupts();
-        distance = fwd_change;
+        distance = fwd_change_back;
         interrupts();
 
         return distance;
     }
 
-    inline float robot_rot_change()
+    inline float robot_rot_change_back()
     {
         float distance;
 
         noInterrupts();
-        distance = rot_change;
+        distance = rot_change_back;
         interrupts();
 
         return distance;
     }
 
-    inline int leftRPS()
+    inline int leftRPS_back()
     {
         int rps;
 
         noInterrupts();
-        rps = (left_delta / time_change_us) * 1000000;
+        rps = ((float) left_delta_back / loopTime);
         interrupts();
 
         return rps;
     }
 
-    inline int rightRPS()
+    inline int rightRPS_back()
     {
         int rps;
 
         noInterrupts();
-        rps = (right_delta / time_change_us) * 1000000;
+        rps = ((float) right_delta_back / loopTime);
+        interrupts();
+
+        return rps;
+    }
+
+    // front pair values
+    inline float robotDistanceFront()
+    {
+        float distance;
+
+        noInterrupts();
+        distance = robot_distance_front; // in mm
+        interrupts();
+
+        return distance;
+    }
+
+    inline float robotAngleFront()
+    {
+        float angle;
+
+        noInterrupts();
+        angle = robot_angle_front;
+        interrupts();
+
+        return angle;
+    }
+
+    inline float robot_speed_front()
+    {
+        float speed;
+
+        noInterrupts();
+        speed = ((float) fwd_change_front / loopTime);
+        interrupts();
+
+        return speed;
+    }
+
+    inline float robot_omega_front()
+    { /////given in degrees per second!!!!!
+        float omega;
+
+        noInterrupts();
+        omega = ((float) rot_change_front / loopTime);
+        interrupts();
+
+        return omega;
+    }
+
+    inline float robot_fwd_change_front()
+    {
+        float distance;
+
+        noInterrupts();
+        distance = fwd_change_front;
+        interrupts();
+
+        return distance;
+    }
+
+    inline float robot_rot_change_front()
+    {
+        float distance;
+
+        noInterrupts();
+        distance = rot_change_front;
+        interrupts();
+
+        return distance;
+    }
+
+    inline int leftRPS_front()
+    {
+        int rps;
+
+        noInterrupts();
+        rps = ((float) left_delta_front / loopTime);
+        interrupts();
+
+        return rps;
+    }
+
+    inline int rightRPS_front()
+    {
+        int rps;
+
+        noInterrupts();
+        rps = ((float) right_delta_front / loopTime);
         interrupts();
 
         return rps;
@@ -321,18 +413,21 @@ private:
     volatile long encoderCounterLeftFront;
     volatile long lastEncodedLeftFront;
 
-    volatile float robot_distance; // the complete distance travel by robot, this get's incremented using the update function
-    volatile float robot_angle;    // same like above
+    volatile float robot_distance_back; // the complete distance travel by robot, this get's incremented using the update function
+    volatile float robot_angle_back;    // same like above
+    volatile float robot_distance_front;
+    volatile float robot_angle_front;
 
-    unsigned long prevTime;
-    
     // the change in distance or angle in the last tick.
-    float fwd_change;
-    float rot_change;
+    float fwd_change_back;
+    float rot_change_back;
+    float fwd_change_front;
+    float rot_change_front;
 
-    float left_delta; // this variable holds the number of encoder counts during two update calls
-    float right_delta;
+    int left_delta_front; // this variable holds the number of encoder counts during two update calls
+    int right_delta_front;
+    int left_delta_back; // this variable holds the number of encoder counts during two update calls
+    int right_delta_back;
 
-    int time_change_us;
-    int time_change_us_temp;
+    float loopTime;
 };

@@ -35,14 +35,20 @@ const int RIGHT_FRONT_MOTOR_PWM = 1;
 const int PULSES_PER_ROTATION = 1495; // encoder pulse count for rotation, all have same values for 20 rotations (1494, 1495, 1496, 1497 averages)
 const int WHEEL_DIAMETER_BACK = 65;
 const int WHEEL_DIAMETER_FRONT = 63;
-const float WHEEL_GAP = 189.5;                       // distance between the wheels in mm
-const float MM_PER_ROTATION = WHEEL_DIAMETER_BACK * PI; //  pi*wheel diameter .......d=33mm
+const float WHEEL_GAP = 189.5; // distance between the wheels in mm
+const float MM_PER_ROTATION_BACK = WHEEL_DIAMETER_BACK * PI;
+const float MM_PER_ROTATION_FRONT = WHEEL_DIAMETER_FRONT * PI; 
 const float DEG_PER_MM_DIFFERENCE = 180.0 / (PI * WHEEL_GAP); //degrees of rotation per unit difference between the left and right wheel travel distances
 
-const float FWD_KP = 1.0;
-const float FWD_KD = 1.0;
-const float ROT_KP = 1.0;
-const float ROT_KD = 1.0;
+const float FWD_KP_BACK = 1.0;
+const float FWD_KD_BACK = 1.0;
+const float ROT_KP_BACK = 1.0;
+const float ROT_KD_BACK = 1.0;
+
+const float FWD_KP_FRONT = 1.0;
+const float FWD_KD_FRONT = 1.0;
+const float ROT_KP_FRONT = 1.0;
+const float ROT_KD_FRONT = 1.0;
 
 const int ROBOT_RADIUS = 115; //measure it to the absolute 1mm accuracy
 const float RADIANS_PER_DEGREE = PI / 180; 
@@ -51,9 +57,10 @@ const int PWM_RESOLUTION_BITS = 8;
 const int PWM_RESOLUTION  = 256;
 
 
-const int MIN_MOTOR_BIAS = 15;
-const float MAX_MOTOR_PERCENTAGE = 85;
-const float MIN_MOTOR_PERCENTAGE = 10; // when the given percentage is below this value, percentage is set to zero to damp oscillations
+const int MIN_MOTOR_BIAS = 13;
+const int MAX_MOTOR_REACH = 96; //this is the value the final motor percentages reaches upto
+const float MAX_MOTOR_PERCENTAGE = 104; //smaller head room is given for PID corrections
+const float MIN_MOTOR_PERCENTAGE = 5; // when the given percentage is below this value, percentage is set to zero to damp oscillations
 //find this value for the all 4 motors and set the maximum from them here
 
 //change motor directions to make the motors spin forward when both motors are forward commanded (for use of incorrect wiring)
@@ -103,5 +110,5 @@ const int SWITCH_PIN = 7;
 
 //*************************************************************SYSTICK*******************************************
 
-#define FAST_TICKER 0.026
+#define FAST_TICKER 0.025
 #define SLOW_TICKER 0.060
