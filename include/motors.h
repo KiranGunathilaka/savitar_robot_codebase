@@ -68,13 +68,13 @@ public:
 
   void setupPWM()
   {
-    ledcSetup(0, 10000, PWM_RESOLUTION_BITS); // check for different pwm frequencies
+    ledcSetup(0, 5000, PWM_RESOLUTION_BITS); // check for different pwm frequencies
     ledcAttachPin(LEFT_BACK_MOTOR_PWM, 0);
-    ledcSetup(1, 10000, PWM_RESOLUTION_BITS);
+    ledcSetup(1, 5000, PWM_RESOLUTION_BITS);
     ledcAttachPin(RIGHT_BACK_MOTOR_PWM, 1);
-    ledcSetup(2, 10000, PWM_RESOLUTION_BITS);
+    ledcSetup(2, 5000, PWM_RESOLUTION_BITS);
     ledcAttachPin(LEFT_FRONT_MOTOR_PWM, 2);
-    ledcSetup(3, 10000, PWM_RESOLUTION_BITS);
+    ledcSetup(3, 5000, PWM_RESOLUTION_BITS);
     ledcAttachPin(RIGHT_FRONT_MOTOR_PWM, 3);
   }
 
@@ -309,8 +309,8 @@ public:
     }
     else
     {
-      digitalWrite(RIGHT_BACK_MOTOR_IN1, LOW);
-      digitalWrite(RIGHT_BACK_MOTOR_IN2, HIGH);
+      digitalWrite(RIGHT_FRONT_MOTOR_IN1, LOW);
+      digitalWrite(RIGHT_FRONT_MOTOR_IN2, HIGH);
       ledcWrite(3, pwm);
     }
   }

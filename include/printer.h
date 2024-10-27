@@ -171,9 +171,9 @@ public:
         }
     }
 
-    void printEncoderCounts(bool newline)
+    void printEncoderCounts(bool newline = true)
     {
-        Serial.print("Encoder Countns || Left_Back: ");
+        Serial.print("Encoder Counts : Left_Back: ");
         Serial.print(encoders.tempLeftBack);
         Serial.print("| Left_Front: ");
         Serial.print(encoders.tempLeftFront);

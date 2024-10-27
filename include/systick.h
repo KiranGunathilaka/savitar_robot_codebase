@@ -28,14 +28,15 @@ public:
     {
         ticker.attach(tickerTime, []()
                       {
-                          encoders.update();
-                          // motors.update();
-                          sensors.update();
+                            encoders.update();
+                            //motors.update();
+                            sensors.update();
 
-                          printer.printTimeDiff();
-                        //   printer.printTof();
-                        //   printer.printAllColors(true);
-                      });
+                            printer.printTimeDiff();
+                            printer.printTof();
+                            //printer.printAllColors(true); 
+                            printer.printEncoderCounts();
+                        });
     }
 
     void enableSlowMode(bool enable)

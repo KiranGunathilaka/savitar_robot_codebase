@@ -4,41 +4,40 @@
 
 //*******************************************************Motors****************************************************************
 
-const int LeftFrontEncoderPin1 = 17;
-const int LeftFrontEncoderPin2 = 18;
+const int LeftFrontEncoderPin1 = 18;
+const int LeftFrontEncoderPin2 = 8;
 
-const int LeftBackEncoderPin1 = 17;
-const int LeftBackEncoderPin2 = 18;
+const int LeftBackEncoderPin1 = 3;
+const int LeftBackEncoderPin2 = 46;
 
 const int RightFrontEncoderPin1 = 48;
 const int RightFrontEncoderPin2 = 45;
 
-const int RightBackEncoderPin1 = 48;
-const int RightBackEncoderPin2 = 45;
+const int RightBackEncoderPin1 = 35;
+const int RightBackEncoderPin2 = 36;
 
 // motor controller 1
-const int LEFT_FRONT_MOTOR_PWM = 4;
-const int LEFT_FRONT_MOTOR_IN1 = 5;
-const int LEFT_FRONT_MOTOR_IN2 = 6;
+const int LEFT_FRONT_MOTOR_PWM = 17;
+const int LEFT_FRONT_MOTOR_IN1 = 15;
+const int LEFT_FRONT_MOTOR_IN2 = 16;
 const int LEFT_BACK_MOTOR_IN1 = 5;
 const int LEFT_BACK_MOTOR_IN2 = 6;
 const int LEFT_BACK_MOTOR_PWM = 4;
 
 // motor controller 2
-const int RIGHT_FRONT_MOTOR_PWM = 4;
-const int RIGHT_FRONT_MOTOR_IN1 = 5;
-const int RIGHT_FRONT_MOTOR_IN2 = 6;
-const int RIGHT_BACK_MOTOR_IN1 = 5;
-const int RIGHT_BACK_MOTOR_IN2 = 6;
-const int RIGHT_BACK_MOTOR_PWM = 4;
+const int RIGHT_BACK_MOTOR_PWM = 37;
+const int RIGHT_BACK_MOTOR_IN1 = 39;
+const int RIGHT_BACK_MOTOR_IN2 = 40;
+const int RIGHT_FRONT_MOTOR_IN1 = 42;
+const int RIGHT_FRONT_MOTOR_IN2 = 2;
+const int RIGHT_FRONT_MOTOR_PWM = 1;
 
-const int PWM_RESOLUTION_BITS = 8;
-
-const int PULSES_PER_ROTATION = 1250; // encoder pulse count for rotation, check whether all 4 encoders before using same value for all.
-const int WHEEL_DIAMETER = 65;
-const float WHEEL_GAP = 108;                       // distance between the wheels in mm
-const float MM_PER_ROTATION = WHEEL_DIAMETER * PI; //  pi*wheel diameter .......d=33mm
-const float DEG_PER_MM_DIFFERENCE = 180.0 / (PI * WHEEL_GAP);
+const int PULSES_PER_ROTATION = 1495; // encoder pulse count for rotation, all have same values for 20 rotations (1494, 1495, 1496, 1497 averages)
+const int WHEEL_DIAMETER_BACK = 65;
+const int WHEEL_DIAMETER_FRONT = 63;
+const float WHEEL_GAP = 189.5;                       // distance between the wheels in mm
+const float MM_PER_ROTATION = WHEEL_DIAMETER_BACK * PI; //  pi*wheel diameter .......d=33mm
+const float DEG_PER_MM_DIFFERENCE = 180.0 / (PI * WHEEL_GAP); //degrees of rotation per unit difference between the left and right wheel travel distances
 
 const float FWD_KP = 1.0;
 const float FWD_KD = 1.0;
@@ -48,38 +47,40 @@ const float ROT_KD = 1.0;
 const int ROBOT_RADIUS = 115; //measure it to the absolute 1mm accuracy
 const float RADIANS_PER_DEGREE = PI / 180; 
 
-const int PWM_RESOLUTION = 8;
+const int PWM_RESOLUTION_BITS = 8;
+const int PWM_RESOLUTION  = 256;
+
 
 const int MIN_MOTOR_BIAS = 15;
-const int MAX_MOTOR_PERCENTAGE = 85;
-const int MIN_MOTOR_PERCENTAGE = 10; // when the given percentage is below this value, percentage is set to zero to damp oscillations
+const float MAX_MOTOR_PERCENTAGE = 85;
+const float MIN_MOTOR_PERCENTAGE = 10; // when the given percentage is below this value, percentage is set to zero to damp oscillations
 //find this value for the all 4 motors and set the maximum from them here
 
 //change motor directions to make the motors spin forward when both motors are forward commanded (for use of incorrect wiring)
 #define MOTOR_LEFT_BACK_POLARITY (1)
-#define MOTOR_RIGHT_BACK_POLARITY (1)
-#define MOTOR_LEFT_FRONT_POLARITY (1)
+#define MOTOR_RIGHT_BACK_POLARITY (-1)
+#define MOTOR_LEFT_FRONT_POLARITY (-1)
 #define MOTOR_RIGHT_FRONT_POLARITY (1)
 //**********************************************************Sensors**********************************************************
 
 // I2C Pins for ESP32
-#define I2C_SDA_0 19
-#define I2C_SCL_0 20
+#define I2C_SDA_0 9
+#define I2C_SCL_0 10
 
 #define I2C_SDA_1 21
 #define I2C_SCL_1 47
 
-#define MULTIPLEXER_ADDR 0x73
+#define MULTIPLEXER_ADDR 0x70
 #define TCS34725_ADDR 0x29
 
 #define TCS34725_FAST_INTEGRATION_TIME 0xFF // 1 cycles,  4.8 seconds for one sensor , delay 25ms
 #define TCS34725_SLOW_INTEGRATION_TIME 0xFC // 4 cycles,  9.6 seconds for one sensor , delay 60ms
 
-const int ToF_XSHUT_Right = 9;
-const int ToF_XSHUT_Left = 10;
-const int ToF_XSHUT_Front = 11;
-const int ToF_XSHUT_Center_Top = 12;
-const int ToF_XSHUT_Center_Bottom = 13;
+const int ToF_XSHUT_Right = 11;
+const int ToF_XSHUT_Left = 12;
+const int ToF_XSHUT_Front = 13;
+const int ToF_XSHUT_Center_Top = 19;
+const int ToF_XSHUT_Center_Bottom = 20;
 
 const int TOF_LEFT_ADD = 0x30;
 const int TOF_RIGHT_ADD = 0x31;
@@ -102,5 +103,5 @@ const int SWITCH_PIN = 7;
 
 //*************************************************************SYSTICK*******************************************
 
-#define FAST_TICKER 0.025
+#define FAST_TICKER 0.026
 #define SLOW_TICKER 0.060
