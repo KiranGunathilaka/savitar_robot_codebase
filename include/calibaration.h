@@ -22,7 +22,7 @@ private:
     };
 
     const int SAMPLES_PER_PERCENTAGE = 50; // Number of samples to average for each percentage
-    const int STABILIZE_DELAY = 400;       // Time in ms to wait for motor speed to stabilize
+    const int STABILIZE_DELAY = 500;       // Time in ms to wait for motor speed to stabilize
     const float PERCENTAGE_STEP = 1.0;     // Step size for percentage increments
 
 public:
@@ -216,7 +216,7 @@ public:
             rb_sum += abs((float) encoders.rightRPS_back());
             lf_sum += abs((float) encoders.leftRPS_front());
             rf_sum += abs((float) encoders.rightRPS_front());
-            delay(10); // Small delay between samples
+            delay(20); // Small delay between samples
         }
 
         // Calculate averages
@@ -240,7 +240,7 @@ public:
 
             MotorData data = measureAtPercentage(percentage);
             printMotorData(data);
-            delay(20); // Brief pause between measurements
+            delay(30); // Brief pause between measurements
         }
 
         delay(30);
@@ -252,7 +252,7 @@ public:
 
             MotorData data = measureAtPercentage(percentage);
             printMotorData(data);
-            delay(20);
+            delay(30);
         }
         delay(30);
         motors.coast();

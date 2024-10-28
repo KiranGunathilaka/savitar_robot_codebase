@@ -43,6 +43,10 @@ public:
 
     const int tofOffset[5] = {-10, -16, -10, -15, -10}; // adjust these values
 
+    float steering_kp = STEERING_KP;
+    float steering_kd = STEERING_KD;
+    float steering_ki = STEERING_KI;
+
     enum Colors
     {
         WHITE,
@@ -56,12 +60,12 @@ public:
     bool sensorsOnLine[5] = {false, false, false, false, false}; // stores whether each sensor detected the currently following color
     Colors sensorColors[5] = {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN};
 
-    int whiteThreshold[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
-    float redToGreenOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
-    float redToBlueOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
-    float blueToRedOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
-    float blueToGreenOffset[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
-    int blackThreshold[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}};
+    int whiteThreshold[5][2] = {{538, 534}, {534, 534}, {534, 534}, {580, 550}, {534, 534}};
+    float redToGreenOffset[5][2] = {{0.422, 0.416}, {0.377, 0.376}, {0.372, 0.380}, {0.414, 0.409}, {0.357, 0.364}};
+    float redToBlueOffset[5][2] = {{0.47, 0.464}, {0.429, 0.428}, {0.423, 0.435}, {0.461, 0.456}, {0.422, 0.429}};
+    float blueToRedOffset[5][2] = {{0.1036, 0.0991}, {0.1185, 0.1247}, {0.1161, 0.1106}, {0.1161, 0.1106}, {0.1161, 0.1106}};
+    float blueToGreenOffset[5][2] = {{0.0704, 0.0674}, {0.0704, 0.0674}, {0.0704, 0.0674}, {0.0704, 0.0674}, {0.0704, 0.0674}};
+    int blackThreshold[5][2] = {{53, 53}, {72, 70}, {89, 88}, {62, 62}, {59, 68}};
 
     Colors followingColor = WHITE;
 
@@ -236,37 +240,40 @@ public:
 
     Colors classifyColor(int sensor, float r, float g, float b, uint16_t lux)
     {
-        // Find the dominant color
-        if (lux > whiteThreshold[sensor][modeIndex] * 0.61)
+        if (sensors.getModeIndex() == FAST_MODE)
         {
-            return WHITE;
+            if (lux > whiteThreshold[sensor][modeIndex] * 0.6)
+            {
+                return WHITE;
+            }
+            else if (lux < blackThreshold[sensor][modeIndex] * 1.4)
+            {
+                return BLACK;
+            }
+            return UNKNOWN;
         }
-        else if (r > g + redToGreenOffset[sensor][modeIndex] * 0.8 && r > b + redToBlueOffset[sensor][modeIndex] * 0.8)
-        {
-            return RED;
-        }
-        else if (b > r + blueToRedOffset[sensor][modeIndex] * 0.6 && b > g + blueToGreenOffset[sensor][modeIndex] * 0.6)
-        {
-            return BLUE;
-        }
-        else if (lux < blackThreshold[sensor][modeIndex] * 1.4)
-        {
-            return BLACK;
-        }
-        return UNKNOWN; // consider unknown to be the colour of the background as in the interfaces of 2 colours it gives none of the above values
-    }
 
-    Colors classifyBlackWhite(int sensor, uint16_t lux)
-    {
-        if (lux > whiteThreshold[sensor][modeIndex] * 0.6)
+        else
         {
-            return WHITE;
+
+            if (lux > whiteThreshold[sensor][modeIndex] * 0.6)
+            {
+                return WHITE;
+            }
+            else if (r > g + redToGreenOffset[sensor][modeIndex] * 0.8 && r > b + redToBlueOffset[sensor][modeIndex] * 0.8)
+            {
+                return RED;
+            }
+            else if (b > r + blueToRedOffset[sensor][modeIndex] * 0.6 && b > g + blueToGreenOffset[sensor][modeIndex] * 0.6)
+            {
+                return BLUE;
+            }
+            else if (lux < blackThreshold[sensor][modeIndex] * 1.4)
+            {
+                return BLACK;
+            }
+            return UNKNOWN; // consider unknown to be the colour of the background as in the interfaces of 2 colours it gives none of the above values
         }
-        else if (lux < blackThreshold[sensor][modeIndex] * 1.5)
-        {
-            return BLACK;
-        }
-        return UNKNOWN;
     }
 
     void tofReset()

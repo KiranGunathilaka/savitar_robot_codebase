@@ -173,11 +173,11 @@ public:
     float l_feed_percentage;
     if (l_rps >= 0)
     {
-      l_feed_percentage = 0.020475 * l_rps - 1.37122;
+      l_feed_percentage = 0.0220 * l_rps - 3.4823;
     }
     else
     {
-      l_feed_percentage = 0.020283 * l_rps + 3.09038;
+      l_feed_percentage = 0.0217 * l_rps + 5.2456;
     }
 
     return l_feed_percentage;
@@ -190,11 +190,11 @@ public:
     float r_feed_percentage;
     if (r_rps >= 0)
     {
-      r_feed_percentage = 0.020379 * r_rps - 1.18911;
+      r_feed_percentage = 0.0215 * r_rps - 2.6277;
     }
     else
     {
-      r_feed_percentage = 0.020743 * r_rps + 2.71375;
+      r_feed_percentage = 0.0225 * r_rps + 5.3887;
     }
 
     return r_feed_percentage;
@@ -207,11 +207,11 @@ public:
     float l_feed_percentage;
     if (l_rps >= 0)
     {
-      l_feed_percentage = 0.020792 * l_rps - 2.53192;
+      l_feed_percentage = 0.0221 * l_rps - 3.5795;
     }
     else
     {
-      l_feed_percentage = 0.020412 * l_rps + 3.75929;
+      l_feed_percentage = 0.0222 * l_rps + 5.8467;
     }
 
     return l_feed_percentage;
@@ -224,11 +224,11 @@ public:
     float r_feed_percentage;
     if (r_rps >= 0)
     {
-      r_feed_percentage = 0.019446 * r_rps - 2.51284;
+      r_feed_percentage = 0.0210 * r_rps - 5.1386;
     }
     else
     {
-      r_feed_percentage = 0.020861 * r_rps + 4.46584;
+      r_feed_percentage = 0.0224 * r_rps + 7.2503;
     }
 
     return r_feed_percentage;

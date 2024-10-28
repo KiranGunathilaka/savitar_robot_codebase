@@ -58,8 +58,8 @@ const int PWM_RESOLUTION  = 256;
 
 
 const int MIN_MOTOR_BIAS = 13;
-const int MAX_MOTOR_REACH = 96; //this is the value the final motor percentages reaches upto
-const float MAX_MOTOR_PERCENTAGE = 104; //smaller head room is given for PID corrections
+const int MAX_MOTOR_REACH = 90; //this is the value the final motor percentages reaches upto
+const float MAX_MOTOR_PERCENTAGE = 90; //smaller head room is given for PID
 const float MIN_MOTOR_PERCENTAGE = 5; // when the given percentage is below this value, percentage is set to zero to damp oscillations
 //find this value for the all 4 motors and set the maximum from them here
 
@@ -95,9 +95,9 @@ const int TOF_FRONT_ADD = 0x32;
 const int TOF_CENTER_TOP_ADD = 0x33;
 const int TOF_CENTER_BOTTOM_ADD = 0x34;
 
-const float steering_kp = 1.0;
-const float steering_kd = 1.0;
-const float steering_ki = 1.0;
+const float STEERING_KP = 40.0;
+const float STEERING_KD = 20.0;
+const float STEERING_KI = 10.0;
 const float SENSOR_WEIGHTS[5] = {-2.0, -1.0, 0.0, 1.0, 2.0};
 
 //*************************************************************CALIBRATION******************************************

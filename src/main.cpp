@@ -7,6 +7,8 @@
 #include "printer.h"
 #include "calibaration.h"
 #include "nvs.h"
+#include "profile.h"
+#include "motion.h"
 
 Motors motors;
 Encoders encoders;
@@ -16,6 +18,10 @@ Switches switches;
 Printer printer;
 NVS nvs;
 Calibaration calibaration;
+Profile rotation;
+Profile forward;
+Motion motion;
+
 
 void setup()
 {
@@ -23,12 +29,12 @@ void setup()
 
   encoders.begin();
   motors.begin();
-  //sensors.begin();
+  sensors.begin();
   systick.begin();
 
   switches.enableSimulation(true); // will accept serial inputs as switch data (until switches are connected)
 
-  //systick.enableSlowMode(false);
+  // systick.enableSlowMode(false);
   // calibaration.calibrateSensors();
   // nvs.saveCalibrationData();
 
@@ -36,35 +42,16 @@ void setup()
   // calibaration.calibrateSensors();
   // nvs.saveCalibrationData();
 
-  // nvs.loadCalibrationData();
-  // printer.printCalibrationData();
-  delay(10000);
-  calibaration.runMotorCalibration();
+  //nvs.loadCalibrationData();
+  //systick.enableSlowMode(false);
+  printer.printCalibrationData();
+  systick.enableSlowMode(true);
+  motion.reset_drive_system();
+  sensors.setFollowingColor(Sensors::RED);
 }
 
 void loop()
 {
-  // motors.set_right_front_motor_percentage(-50);
-  // motors.set_left_back_motor_percentage(50);
-  // motors.set_right_back_motor_percentage(-50);
-  // motors.set_left_front_motor_percentage(50);
-  // delay(2000);
+  
 
-  // motors.set_right_front_motor_percentage(0);
-  // motors.set_left_back_motor_percentage(-0);
-  // motors.set_right_back_motor_percentage(0);
-  // motors.set_left_front_motor_percentage(-0);
-  // delay(1000);
-
-  // motors.set_right_front_motor_percentage(50);
-  // motors.set_left_back_motor_percentage(-50);
-  // motors.set_right_back_motor_percentage(50);
-  // motors.set_left_front_motor_percentage(-50);
-  // delay(2000);
-
-  // motors.set_right_front_motor_percentage(0);
-  // motors.set_left_back_motor_percentage(-0);
-  // motors.set_right_back_motor_percentage(0);
-  // motors.set_left_front_motor_percentage(-0);
-  // delay(1000);
 }

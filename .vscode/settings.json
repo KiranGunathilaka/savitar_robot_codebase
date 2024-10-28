@@ -6,6 +6,9 @@
         "istream": "cpp",
         "ostream": "cpp",
         "sstream": "cpp",
-        "new": "cpp"
+        "new": "cpp",
+        "memory": "cpp",
+        "random": "cpp",
+        "optional": "cpp"
     }
 }
