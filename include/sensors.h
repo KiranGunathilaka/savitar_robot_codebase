@@ -51,7 +51,6 @@ public:
 
     float steering_kp = STEERING_KP;
     float steering_kd = STEERING_KD;
-    float steering_ki = STEERING_KI;
 
     enum Colors
     {
@@ -160,9 +159,8 @@ public:
     {
         float pTerm = steering_kp * cross_track_error;
         float dTerm = steering_kd * (cross_track_error - last_steering_error);
-        float iTerm = steering_ki * (accumelated_steering_error);
 
-        float adjustment = (pTerm + dTerm + iTerm) * encoders.getLoopTime();
+        float adjustment = (pTerm + dTerm) * encoders.getLoopTime();
 
         last_steering_error = cross_track_error;
         steering_adjustment = adjustment;
