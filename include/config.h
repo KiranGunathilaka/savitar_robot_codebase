@@ -95,14 +95,8 @@ const int TOF_FRONT_ADD = 0x32;
 const int TOF_CENTER_TOP_ADD = 0x33;
 const int TOF_CENTER_BOTTOM_ADD = 0x34;
 
-<<<<<<< HEAD
-const float STEERING_KP = 90.0;
-const float STEERING_KD = 10.0;
-const float STEERING_KI = 0.0;
-=======
 const float STEERING_KP = 40.0;
 const float STEERING_KD =1.0;
->>>>>>> fe3a4687f4c4f928005c3c8a47702ddbecb3b155
 const float SENSOR_WEIGHTS[5] = {-2.0, -1.0, 0.0, 1.0, 2.0};
 
 //*************************************************************CALIBRATION******************************************
