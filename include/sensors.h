@@ -45,7 +45,6 @@ public:
 
     float steering_kp = STEERING_KP;
     float steering_kd = STEERING_KD;
-    float steering_ki = STEERING_KI;
 
     enum Colors
     {
@@ -160,9 +159,8 @@ public:
     {
         float pTerm = steering_kp * cross_track_error;
         float dTerm = steering_kd * (cross_track_error - last_steering_error);
-        float iTerm = steering_ki * (accumelated_steering_error);
 
-        float adjustment = (pTerm + dTerm + iTerm) * encoders.getLoopTime();
+        float adjustment = (pTerm + dTerm) * encoders.getLoopTime();
 
         last_steering_error = cross_track_error;
         steering_adjustment = adjustment;
@@ -196,6 +194,8 @@ public:
 
         if (colourEnabled)
         {
+            int error = 0;
+
             for (uint8_t t = 3; t < 8; t++)
             {
                 selectChannel(t);
@@ -213,7 +213,6 @@ public:
 
                 // Serial.printf(" r: %f g: %f b: %f c: %d lux:%d ", r_ratio, g_ratio, b_ratio, c, lux);
 
-                int error = 0;
 
                 if (followingColor == color && steering_mode == STEER_NORMAL)
                 {
