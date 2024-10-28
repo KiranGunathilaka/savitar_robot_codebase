@@ -30,7 +30,7 @@ public:
         ticker.attach(tickerTime, []()
                       {
                           encoders.update();
-                          motors.update(150.0, 0.0, sensors.get_steering_adjustment());
+                          motors.update(100.0, 0.0, sensors.get_steering_adjustment());
                           sensors.update();
 
                           printer.printTimeDiff();

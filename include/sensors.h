@@ -10,17 +10,23 @@
 class Sensors;
 extern Sensors sensors;
 
+enum
+{
+    STEER_NORMAL,
+    STEERING_OFF,
+};
+
+enum
+{
+    FAST_MODE,
+    SLOW_MODE
+};
+
 class Sensors
 {
 private:
     int integration_time = TCS34725_FAST_INTEGRATION_TIME;
     bool isFast = true;
-
-    enum
-    {
-        FAST_MODE,
-        SLOW_MODE
-    };
 
     // 0 for fast mode(default - black n white) , 1 for slow mode (Colour follwing)-this index will be used to get values from the offset and threshold arrs
     int modeIndex = FAST_MODE;
@@ -68,12 +74,6 @@ public:
     int blackThreshold[5][2] = {{53, 53}, {72, 70}, {89, 88}, {62, 62}, {59, 68}};
 
     Colors followingColor = WHITE;
-
-    enum
-    {
-        STEER_NORMAL,
-        STEERING_OFF,
-    };
 
     uint8_t steering_mode = STEER_NORMAL;
 
@@ -196,6 +196,8 @@ public:
 
         if (colourEnabled)
         {
+            int error = 0;
+
             for (uint8_t t = 3; t < 8; t++)
             {
                 selectChannel(t);
@@ -212,8 +214,6 @@ public:
                 sensorColors[t - 3] = color;
 
                 // Serial.printf(" r: %f g: %f b: %f c: %d lux:%d ", r_ratio, g_ratio, b_ratio, c, lux);
-
-                int error = 0;
 
                 if (followingColor == color && steering_mode == STEER_NORMAL)
                 {

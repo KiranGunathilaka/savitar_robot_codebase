@@ -95,9 +95,9 @@ const int TOF_FRONT_ADD = 0x32;
 const int TOF_CENTER_TOP_ADD = 0x33;
 const int TOF_CENTER_BOTTOM_ADD = 0x34;
 
-const float STEERING_KP = 40.0;
-const float STEERING_KD = 20.0;
-const float STEERING_KI = 10.0;
+const float STEERING_KP = 90.0;
+const float STEERING_KD = 10.0;
+const float STEERING_KI = 0.0;
 const float SENSOR_WEIGHTS[5] = {-2.0, -1.0, 0.0, 1.0, 2.0};
 
 //*************************************************************CALIBRATION******************************************
@@ -110,5 +110,13 @@ const int SWITCH_PIN = 7;
 
 //*************************************************************SYSTICK*******************************************
 
-#define FAST_TICKER 0.025
+#define FAST_TICKER 0.028
 #define SLOW_TICKER 0.060
+
+//************************************************************REPORTING******************************************
+const int broadcastAddress = 232;
+
+//************************************************************ROBOT***********************************************
+
+const int OMEGA = 540;
+const int ALPHA = 3600;
