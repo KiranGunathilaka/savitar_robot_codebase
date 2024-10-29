@@ -42,13 +42,13 @@ const float DEG_PER_MM_DIFFERENCE = 180.0 / (PI * WHEEL_GAP); //degrees of rotat
 
 const float FWD_KP_BACK = 1.0;
 const float FWD_KD_BACK = 1.0;
-const float ROT_KP_BACK = 1.0;
-const float ROT_KD_BACK = 1.0;
+const float ROT_KP_BACK = 4.0;
+const float ROT_KD_BACK = 0.8;
 
 const float FWD_KP_FRONT = 1.0;
 const float FWD_KD_FRONT = 1.0;
-const float ROT_KP_FRONT = 1.0;
-const float ROT_KD_FRONT = 1.0;
+const float ROT_KP_FRONT = 4.0;
+const float ROT_KD_FRONT = 0.8;
 
 const int ROBOT_RADIUS = 115; //measure it to the absolute 1mm accuracy
 const float RADIANS_PER_DEGREE = PI / 180; 
@@ -109,7 +109,7 @@ const int SWITCH_PIN = 7;
 
 //*************************************************************SYSTICK*******************************************
 
-#define FAST_TICKER 0.027
+#define FAST_TICKER 0.025
 #define SLOW_TICKER 0.060
 
 //**************************************************************ROBOT*********************************************

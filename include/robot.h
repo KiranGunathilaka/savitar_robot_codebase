@@ -13,6 +13,7 @@ extern Robot robot;
 
 class Robot
 {
+public:
     void follow_Color_line()
     {
         systick.enableSlowMode(true);
@@ -33,7 +34,8 @@ class Robot
         }
     }
 
-    void is_left_equal(){
+    void is_left_equal()
+    {
         bool isLeftEqual = true;
         for (int i = 0; i < 3; i++)
         {
@@ -45,7 +47,8 @@ class Robot
         }
     }
 
-    void is_right_equal(){
+    void is_right_equal()
+    {
         bool isRightEqual = true;
         for (int i = 2; i < 5; i++)
         {

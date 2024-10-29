@@ -9,6 +9,7 @@
 #include "nvs.h"
 #include "profile.h"
 #include "motion.h"
+#include "robot.h"
 
 Motors motors;
 Encoders encoders;
@@ -21,6 +22,7 @@ Calibaration calibaration;
 Profile rotation;
 Profile forward;
 Motion motion;
+Robot robot;
 
 
 void setup()
@@ -52,6 +54,26 @@ void setup()
 
 void loop()
 {
+  sensors.set_steering_mode(STEERING_OFF);
   
+  robot.turn_left();
 
+  delay(2000);
+
+  robot.turn_right();
+
+  delay(2000);
+
+  robot.turn_180();
+
+  delay(2000);
+  //sensors.set_steering_mode(STEER_NORMAL);
+  
+  motion.move(1200, 200, 0, 1000);
+
+  delay(2000);
+
+  motion.move(-1200, 200, 0, 1000);
+
+  delay(2000);
 }

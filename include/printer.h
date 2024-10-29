@@ -171,16 +171,16 @@ public:
         }
     }
 
-    void printEncoderCounts(bool newline = true)
+    void printEncoderCounts(bool newline = false)
     {
-        Serial.print("Encoder Counts : Left_Back: ");
+        Serial.print("Encoder Counts : L_B: ");
         Serial.print(encoders.tempLeftBack);
-        Serial.print("| Left_Front: ");
+        Serial.print("| L_F: ");
         Serial.print(encoders.tempLeftFront);
-        Serial.print("| Right_Back: ");
-        Serial.print(encoders.tempRightBack);
-        Serial.print("| Right_Front: ");
+        Serial.print("| R_F: ");
         Serial.print(encoders.tempRightFront);
+            Serial.print("| R_B: ");
+        Serial.print(encoders.tempRightBack);
 
         if (newline)
         {
@@ -192,15 +192,15 @@ public:
         }
     }
 
-    void printMotorFeedPercentages(bool newline)
+    void printMotorFeedPercentages(bool newline = false)
     {
-        Serial.print("Motor percentages || Left_Back: ");
+        Serial.print("Motor Percentages || L_B: ");
         Serial.print(motors.left_back_motor_percentage);
-        Serial.print("| Left_Front: ");
+        Serial.print("| L_F: ");
         Serial.print(motors.left_front_motor_percentage);
-        Serial.print("| Right_Back: ");
+        Serial.print("| R_B: ");
         Serial.print(motors.right_front_motor_percentage);
-        Serial.print("| Right_Front: ");
+        Serial.print("| R_F: ");
         Serial.print(motors.right_front_motor_percentage);
 
         if (newline)
