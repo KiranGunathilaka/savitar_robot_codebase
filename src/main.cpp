@@ -47,7 +47,7 @@ void setup()
   printer.printCalibrationData();
   systick.enableSlowMode(true);
   motion.reset_drive_system();
-  sensors.setFollowingColor(Sensors::BLUE);
+  sensors.setFollowingColor(Sensors::RED);
 }
 
 void loop()
