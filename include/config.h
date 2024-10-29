@@ -42,13 +42,13 @@ const float DEG_PER_MM_DIFFERENCE = 180.0 / (PI * WHEEL_GAP); //degrees of rotat
 
 const float FWD_KP_BACK = 1.0;
 const float FWD_KD_BACK = 1.0;
-const float ROT_KP_BACK = 4.0;
-const float ROT_KD_BACK = 0.8;
+const float ROT_KP_BACK = 3.8;
+const float ROT_KD_BACK = 2.0;
 
 const float FWD_KP_FRONT = 1.0;
 const float FWD_KD_FRONT = 1.0;
-const float ROT_KP_FRONT = 4.0;
-const float ROT_KD_FRONT = 0.8;
+const float ROT_KP_FRONT = 3.8;
+const float ROT_KD_FRONT = 2.0;
 
 const int ROBOT_RADIUS = 115; //measure it to the absolute 1mm accuracy
 const float RADIANS_PER_DEGREE = PI / 180; 
@@ -95,8 +95,8 @@ const int TOF_FRONT_ADD = 0x32;
 const int TOF_CENTER_TOP_ADD = 0x33;
 const int TOF_CENTER_BOTTOM_ADD = 0x34;
 
-const float STEERING_KP = 90.0;             //working values speed - 70 Kp - 90 Kd - 25
-const float STEERING_KD =25.0;
+const float STEERING_KP = 100.0;             //working values speed - 70 Kp - 90 Kd - 25
+const float STEERING_KD =30.0;
 const float SENSOR_WEIGHTS[5] = {-2.0, -1.0, 0.0, 1.0, 2.0};
 
 //*************************************************************CALIBRATION******************************************

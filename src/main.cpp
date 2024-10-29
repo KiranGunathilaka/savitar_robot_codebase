@@ -9,7 +9,6 @@
 #include "nvs.h"
 #include "profile.h"
 #include "motion.h"
-#include "robot.h"
 
 Motors motors;
 Encoders encoders;
@@ -22,7 +21,6 @@ Calibaration calibaration;
 Profile rotation;
 Profile forward;
 Motion motion;
-Robot robot;
 
 
 void setup()
@@ -44,36 +42,16 @@ void setup()
   // calibaration.calibrateSensors();
   // nvs.saveCalibrationData();
 
-  //nvs.loadCalibrationData();
-  //systick.enableSlowMode(false);
+  // nvs.loadCalibrationData();
+  systick.enableSlowMode(false);
   printer.printCalibrationData();
   systick.enableSlowMode(true);
   motion.reset_drive_system();
-  sensors.setFollowingColor(Sensors::RED);
+  sensors.setFollowingColor(Sensors::BLUE);
 }
 
 void loop()
 {
-  sensors.set_steering_mode(STEERING_OFF);
   
-  robot.turn_left();
 
-  delay(2000);
-
-  robot.turn_right();
-
-  delay(2000);
-
-  robot.turn_180();
-
-  delay(2000);
-  //sensors.set_steering_mode(STEER_NORMAL);
-  
-  motion.move(1200, 200, 0, 1000);
-
-  delay(2000);
-
-  motion.move(-1200, 200, 0, 1000);
-
-  delay(2000);
 }
