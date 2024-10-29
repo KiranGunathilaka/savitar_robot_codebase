@@ -7,6 +7,7 @@
 #include "Ticker.h"
 #include "printer.h"
 #include "config.h"
+#include "motion.h"
 
 class Systick;
 extern Systick systick;
@@ -30,15 +31,16 @@ public:
         ticker.attach(tickerTime, []()
                       {
                           encoders.update();
-                          motors.update(70.0, 0.0, sensors.get_steering_adjustment());
                           sensors.update();
+                          motion.update();
+                          motors.update(motion.velocity(), motion.omega(), sensors.get_steering_adjustment());
 
                           printer.printTimeDiff();
                           // printer.printTof();
-                          printer.printAllColors(true);
-                          // printer.printEncoderCounts();
-                        //   printer.printSteeringAdjustment(false);
-                        //   printer.printMotorFeedPercentages(true);
+                          //printer.printAllColors(true);
+                          printer.printEncoderCounts();
+                          // printer.printSteeringAdjustment(false);
+                          printer.printMotorFeedPercentages(true);
                       });
     }
 

@@ -76,8 +76,6 @@ public:
     return forward.is_finished();
   }
 
-
-
   void start_turn(float distance, float top_speed, float final_speed, float acceleration)
   {
     rotation.start(distance, top_speed, final_speed, acceleration);
@@ -87,7 +85,6 @@ public:
   {
     return rotation.is_finished();
   }
-
 
   void update()
   {
@@ -105,19 +102,35 @@ public:
     forward.adjust_position(delta);
   }
 
+  void move(float distance, float top_speed, float final_speed, float acceleration)
+  {
+    forward.move(distance, top_speed, final_speed, acceleration);
+  }
 
+  void turn(float distance, float top_speed, float final_speed, float acceleration)
+  {
+    rotation.move(distance, top_speed, final_speed, acceleration);
+  }
+
+  //turn whther it is moving fwd or not
+  void turn_any(float angle, float omega, float alpha)
+  {
+    // get ready to turn
+    rotation.reset();
+    rotation.move(angle, omega, 0, alpha);
+  }
 
   //****************************************************************************//
-  // void stop_at(float position)
-  // {
-  //   float remaining = position - forward.position();
-  //   forward.move(remaining, forward.speed(), 0, forward.acceleration());
-  // }
+  void stop_at(float position)
+  {
+    float remaining = position - forward.position();
+    forward.move(remaining, forward.speed(), 0, forward.acceleration());
+  }
 
-  // void stop_after(float distance)
-  // {
-  //   forward.move(distance, forward.speed(), 0, forward.acceleration());
-  // }
+  void stop_after(float distance)
+  {
+    forward.move(distance, forward.speed(), 0, forward.acceleration());
+  }
 
   void wait_until_position(float position)
   {

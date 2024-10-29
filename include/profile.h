@@ -68,7 +68,6 @@ public:
         m_state = PS_ACCELERATING;
     }
 
-
     void stop()
     {
         noInterrupts();
@@ -86,11 +85,11 @@ public:
     }
 
     void wait_until_finished()
-    {   
-        
+    {
+
         while (m_state != PS_FINISHED)
         {
-            delay(2);
+            delay(encoders.getLoopTime());
         }
     }
 
@@ -161,6 +160,12 @@ public:
         interrupts();
     }
 
+    void move(float distance, float top_speed, float final_speed, float acceleration)
+    {
+        start(distance, top_speed, final_speed, acceleration);
+        wait_until_finished();
+    }
+
     void update()
     {
         if (m_state == PS_IDLE)
@@ -184,7 +189,7 @@ public:
                 };
             }
         }
-        
+
         // try to reach the target speed
         if (m_speed < m_target_speed)
         {
