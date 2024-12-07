@@ -68,11 +68,12 @@ const float MIN_MOTOR_PERCENTAGE = 5; // when the given percentage is below this
 #define MOTOR_RIGHT_BACK_POLARITY (-1)
 #define MOTOR_LEFT_FRONT_POLARITY (-1)
 #define MOTOR_RIGHT_FRONT_POLARITY (1)
+
 //**********************************************************Sensors**********************************************************
 
 // I2C Pins for ESP32
-#define I2C_SDA_0 9
-#define I2C_SCL_0 10
+#define I2C_SDA_0 19
+#define I2C_SCL_0 20
 
 #define I2C_SDA_1 21
 #define I2C_SCL_1 47
@@ -83,11 +84,11 @@ const float MIN_MOTOR_PERCENTAGE = 5; // when the given percentage is below this
 #define TCS34725_FAST_INTEGRATION_TIME 0xFF // 1 cycles,  4.8 seconds for one sensor , delay 25ms
 #define TCS34725_SLOW_INTEGRATION_TIME 0xFC // 4 cycles,  9.6 seconds for one sensor , delay 60ms
 
-const int ToF_XSHUT_Right = 11;
-const int ToF_XSHUT_Left = 12;
-const int ToF_XSHUT_Front = 13;
-const int ToF_XSHUT_Center_Top = 19;
-const int ToF_XSHUT_Center_Bottom = 20;
+const int ToF_XSHUT_Right = 9;
+const int ToF_XSHUT_Left = 10;
+const int ToF_XSHUT_Front = 11;
+const int ToF_XSHUT_Center_Top = 12;
+const int ToF_XSHUT_Center_Bottom = 13;
 
 const int TOF_LEFT_ADD = 0x30;
 const int TOF_RIGHT_ADD = 0x31;
@@ -116,3 +117,13 @@ const int SWITCH_PIN = 7;
 
 const int OMEGA = 540;
 const int ALPHA = 3600;
+
+
+//***********************************************************REPORTING*********************************************
+
+const uint8_t broadcastAddress[] = { 0xCC, 0x50, 0xE3, 0X41, 0x1C, 0xD6 };
+
+//**********************************************************SERVOS*************************************************
+
+const int SERVO_GRIPPER_PIN = 7;
+const int SERVO_LIFT_PIN = 0;

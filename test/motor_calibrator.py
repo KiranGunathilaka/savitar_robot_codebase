@@ -8,7 +8,7 @@ import os
 from scipy import stats
 
 class MotorCalibrationPlotter:
-    def __init__(self, port='COM7', baudrate=115200, log_dir='motor_logs'):
+    def __init__(self, port='COM3', baudrate=115200, log_dir='motor_logs'):
         # Initialize data storage
         self.percentages = []
         self.lb_rps = []
@@ -380,9 +380,9 @@ class MotorCalibrationPlotter:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Plot motor calibration data from serial port')
-    parser.add_argument('--port', default='COM7', help='Serial port to use')
+    parser.add_argument('--port', default='COM3', help='Serial port to use')
     parser.add_argument('--baud', type=int, default=115200, help='Baud rate')
-    parser.add_argument('--log-dir', default='./test/motor_logs', help='Directory to save logs and plots')
+    parser.add_argument('--log-dir', default='./motor_logs', help='Directory to save logs and plots')
     args = parser.parse_args()
     
     plotter = MotorCalibrationPlotter(port=args.port, baudrate=args.baud, log_dir=args.log_dir)

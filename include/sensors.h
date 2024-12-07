@@ -179,17 +179,17 @@ public:
             prevFront = front_tof;
             front_tof = (prevFront + tofFront.readRangeContinuousMillimeters() + tofOffset[2]) / 2.0;
 
-            // prevCenterBottom = center_bottom_tof;
-            // center_bottom_tof = (prevCenterBottom + tofCenterBottom.readRangeContinuousMillimeters() + tofOffset[3]) / 2.0;
+            prevCenterBottom = center_bottom_tof;
+            center_bottom_tof = (prevCenterBottom + tofCenterBottom.readRangeContinuousMillimeters() + tofOffset[3]) / 2.0;
 
-            // prevCenterTop = center_top_tof;
-            // center_top_tof = (prevCenterTop + tofCenterTop.readRangeContinuousMillimeters() + tofOffset[4]) / 2.0;
+            prevCenterTop = center_top_tof;
+            center_top_tof = (prevCenterTop + tofCenterTop.readRangeContinuousMillimeters() + tofOffset[4]) / 2.0;
 
             right_tof = abs(prevRight - right_tof) > 3 ? right_tof : prevRight;
             left_tof = abs(prevLeft - left_tof) > 3 ? left_tof : prevLeft;
             front_tof = abs(prevFront - front_tof) > 3 ? front_tof : prevFront;
-            // center_bottom_tof = abs(prevCenterBottom - center_bottom_tof) > 3 ? center_bottom_tof : prevCenterBottom;
-            // center_top_tof = abs(prevCenterTop - center_top_tof) > 3 ? center_top_tof : prevCenterTop;
+            center_bottom_tof = abs(prevCenterBottom - center_bottom_tof) > 3 ? center_bottom_tof : prevCenterBottom;
+            center_top_tof = abs(prevCenterTop - center_top_tof) > 3 ? center_top_tof : prevCenterTop;
         }
 
         if (colourEnabled)
@@ -291,7 +291,7 @@ public:
         Wire.begin(I2C_SDA_0, I2C_SCL_0, 400000);
         isWire0Init = true;
 
-        // tofRight.setBus(&Wire);
+        tofRight.setBus(&Wire);
         tofLeft.setBus(&Wire);
         tofFront.setBus(&Wire);
         tofCenterBottom.setBus(&Wire);
@@ -311,13 +311,13 @@ public:
         tofFront.init(true);
         tofFront.setAddress(TOF_FRONT_ADD);
 
-        // digitalWrite(ToF_XSHUT_Center_Top, HIGH);
-        // tofCenterTop.init(true);
-        // tofCenterTop.setAddress(TOF_CENTER_TOP_ADD);
+        digitalWrite(ToF_XSHUT_Center_Top, HIGH);
+        tofCenterTop.init(true);
+        tofCenterTop.setAddress(TOF_CENTER_TOP_ADD);
 
-        // digitalWrite(ToF_XSHUT_Center_Bottom, HIGH);
-        // tofCenterBottom.init(true);
-        // tofCenterBottom.setAddress(TOF_CENTER_BOTTOM_ADD);
+        digitalWrite(ToF_XSHUT_Center_Bottom, HIGH);
+        tofCenterBottom.init(true);
+        tofCenterBottom.setAddress(TOF_CENTER_BOTTOM_ADD);
 
         Serial.println("ToF addresses set");
 
@@ -326,14 +326,14 @@ public:
         tofRight.startContinuous();
         tofLeft.startContinuous();
         tofFront.startContinuous();
-        // tofCenterTop.startContinuous();
-        // tofCenterBottom.startContinuous();
+        tofCenterTop.startContinuous();
+        tofCenterBottom.startContinuous();
 
         tofRight.setMeasurementTimingBudget(20000);
         tofLeft.setMeasurementTimingBudget(20000);
         tofFront.setMeasurementTimingBudget(20000);
-        // tofCenterTop.setMeasurementTimingBudget(20000);
-        // tofCenterBottom.setMeasurementTimingBudget(20000);
+        tofCenterTop.setMeasurementTimingBudget(20000);
+        tofCenterBottom.setMeasurementTimingBudget(20000);
 
         delay(5);
     }
