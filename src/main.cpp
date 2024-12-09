@@ -28,6 +28,7 @@ Motion motion;
 Robot robot;
 Reporting reporter;
 
+Reporting* Reporting::instance = nullptr;  
 
 void setup()
 {
@@ -35,29 +36,35 @@ void setup()
 
   encoders.begin();
   motors.begin();
-  sensors.begin();
+  //sensors.begin();
+
+  sensors.enableColourSensorReadings();
+  sensors.enableToFReadings();
+
   systick.begin();
+  reporter.begin();
+  servos.begin();
 
   switches.enableSimulation(true); // will accept serial inputs as switch data (until switches are connected)
 
-  // systick.enableSlowMode(false);
+  systick.enableSlowMode(false);
+  //calibaration.calibrateSensors();
+  //nvs.saveCalibrationData();
+
+  //systick.enableSlowMode(true);
   // calibaration.calibrateSensors();
   // nvs.saveCalibrationData();
 
-  // systick.enableSlowMode(true);
-  // calibaration.calibrateSensors();
-  // nvs.saveCalibrationData();
-
-  //nvs.loadCalibrationData();
-  //systick.enableSlowMode(false);
-  //printer.printCalibrationData();
-  systick.enableSlowMode(true);
+  nvs.loadCalibrationData();
+  systick.enableSlowMode(false);
+  printer.printCalibrationData();
   motion.reset_drive_system();
-  sensors.setFollowingColor(Sensors::RED);
+  sensors.setFollowingColor(Sensors::WHITE);
 }
 
 void loop()
 {
+  
   // sensors.set_steering_mode(STEERING_OFF);
   
   // robot.turn_left();

@@ -2,7 +2,7 @@
 #include <WiFi.h>
 
 // REPLACE WITH THE MAC ADDRESS OF YOUR ESP01S RECEIVER
-uint8_t receiverMac[] = {0xCC, 0x50, 0xE3, 0X41, 0x1C, 0xD6};
+uint8_t receiverMac[] = {0xD8, 0x3B, 0xDA, 0XA3, 0x88, 0x20};
 
 // Structure to hold the data to be sent
 typedef struct sendPacket
@@ -132,18 +132,18 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len)
 
   //these are colour sensor serial prints, integer corresponds to a colour
   //0 white , 1 Red , 2 blue, 3 black , 4 unkonwn 
-  Serial.printf("%d %d %d %d %d", receiveData.cs1, receiveData.cs2, receiveData.cs3, receiveData.cs4, receiveData.cs5);
+  Serial.printf("%d %d %d %d %d  ", receiveData.cs1, receiveData.cs2, receiveData.cs3, receiveData.cs4, receiveData.cs5);
 
   //these are tof distance data
-  Serial.printf("%f %f %f %f %f", receiveData.tof1, receiveData.tof2, receiveData.tof3, receiveData.tof4, receiveData.tof5);
+  Serial.printf("%f %f %f %f %f  ", receiveData.tof1, receiveData.tof2, receiveData.tof3, receiveData.tof4, receiveData.tof5);
 
   //odometry data, each value are in pairs as these are calculated and processed pairwise (front pair, back pair)
-  Serial.printf("%f %f %f %f", receiveData.distanceBack, receiveData.distanceFront, receiveData.angleBack, receiveData.angleFront);
+  Serial.printf("%f %f %f %f  ", receiveData.distanceBack, receiveData.distanceFront, receiveData.angleBack, receiveData.angleFront);
 
   //speeds and omegas of the two pairs
-  Serial.printf("%f %f %f %f", receiveData.speedBack, receiveData.speedFront, receiveData.omegaBack, receiveData.omegaFront);
+  Serial.printf("%f %f %f %f  ", receiveData.speedBack, receiveData.speedFront, receiveData.omegaBack, receiveData.omegaFront);
 
   //indicate wheteher servo is on or off
-  Serial.printf("%b %b", receiveData.servoGripper, receiveData.servoLift);
+  Serial.printf("%b %b \n", receiveData.servoGripper, receiveData.servoLift);
 
 }

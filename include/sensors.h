@@ -31,9 +31,6 @@ private:
     // 0 for fast mode(default - black n white) , 1 for slow mode (Colour follwing)-this index will be used to get values from the offset and threshold arrs
     int modeIndex = FAST_MODE;
 
-    bool tofEnabled = true;
-    bool colourEnabled = true;
-
     bool isWire1Init = false;
     bool isWire0Init = false;
 
@@ -43,6 +40,9 @@ private:
     volatile float steering_adjustment;
 
 public:
+    bool tofEnabled = true;
+    bool colourEnabled = true;
+
     VL53L0X tofRight, tofLeft, tofFront, tofCenterTop, tofCenterBottom;
     int prevLeft, prevRight, prevFront, prevCenterTop, prevCenterBottom;
     volatile int left_tof, right_tof, front_tof, center_top_tof, center_bottom_tof;
@@ -118,19 +118,19 @@ public:
         tofEnabled = true;
     }
 
-    void disableColourSensorReadings()
+        void disableToFReadings()
     {
         tofEnabled = false;
+    }
+
+    void disableColourSensorReadings()
+    {
+        colourEnabled = false;
     }
 
     void enableColourSensorReadings()
     {
         colourEnabled = true;
-    }
-
-    void disableToFReadings()
-    {
-        colourEnabled = false;
     }
 
     float get_steering_adjustment()
@@ -170,8 +170,10 @@ public:
     {
         if (tofEnabled)
         {
+
             prevRight = right_tof;
             right_tof = (float)(prevRight + tofRight.readRangeContinuousMillimeters() + tofOffset[1]) / 2.0;
+
 
             prevLeft = left_tof;
             left_tof = (prevLeft + tofLeft.readRangeContinuousMillimeters() + tofOffset[0]) / 2.0;
@@ -276,6 +278,9 @@ public:
 
     void tofReset()
     {
+        pinMode(I2C_SCL_0, INPUT_PULLUP);
+        pinMode(I2C_SDA_0, INPUT_PULLUP);
+
         digitalWrite(ToF_XSHUT_Right, LOW);
         digitalWrite(ToF_XSHUT_Left, LOW);
         digitalWrite(ToF_XSHUT_Front, LOW);
@@ -290,6 +295,9 @@ public:
 
         Wire.begin(I2C_SDA_0, I2C_SCL_0, 400000);
         isWire0Init = true;
+        Wire.setClock(400000);
+
+        delay(200); 
 
         tofRight.setBus(&Wire);
         tofLeft.setBus(&Wire);
@@ -300,23 +308,33 @@ public:
         delay(2);
 
         digitalWrite(ToF_XSHUT_Right, HIGH);
+        delay(30);
         tofRight.init(true);
+        delay(30);
         tofRight.setAddress(TOF_RIGHT_ADD);
 
         digitalWrite(ToF_XSHUT_Left, HIGH);
+        delay(30);
         tofLeft.init(true);
+        delay(30);
         tofLeft.setAddress(TOF_LEFT_ADD);
 
         digitalWrite(ToF_XSHUT_Front, HIGH);
+        delay(30);
         tofFront.init(true);
+        delay(30);
         tofFront.setAddress(TOF_FRONT_ADD);
 
         digitalWrite(ToF_XSHUT_Center_Top, HIGH);
+        delay(30);
         tofCenterTop.init(true);
+        delay(30);
         tofCenterTop.setAddress(TOF_CENTER_TOP_ADD);
 
         digitalWrite(ToF_XSHUT_Center_Bottom, HIGH);
+        delay(30);
         tofCenterBottom.init(true);
+        delay(30);
         tofCenterBottom.setAddress(TOF_CENTER_BOTTOM_ADD);
 
         Serial.println("ToF addresses set");
@@ -334,6 +352,8 @@ public:
         tofFront.setMeasurementTimingBudget(20000);
         tofCenterTop.setMeasurementTimingBudget(20000);
         tofCenterBottom.setMeasurementTimingBudget(20000);
+
+        Serial.println("TOF Init Successful");
 
         delay(5);
     }

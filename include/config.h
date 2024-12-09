@@ -121,9 +121,9 @@ const int ALPHA = 3600;
 
 //***********************************************************REPORTING*********************************************
 
-const uint8_t broadcastAddress[] = { 0xCC, 0x50, 0xE3, 0X41, 0x1C, 0xD6 };
+const uint8_t broadcastAddress[] = { 0xFC, 0xB4, 0x67, 0XF5, 0x62, 0x78 };
 
 //**********************************************************SERVOS*************************************************
 
 const int SERVO_GRIPPER_PIN = 7;
-const int SERVO_LIFT_PIN = 0;
+const int SERVO_LIFT_PIN = 14;
