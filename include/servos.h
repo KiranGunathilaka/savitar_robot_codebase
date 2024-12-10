@@ -42,15 +42,6 @@ public:
     }
 
 
-    void liftToMeasure15()
-    {
-        while(sensors.center_top_tof >= 20){
-            servoLift.write(120);
-            delay(50);
-        }
-        servoLift.write(90);
-    }
-
     void openArms()
     {
         servoGripper.write(OPEN_ARM_ANGLE);

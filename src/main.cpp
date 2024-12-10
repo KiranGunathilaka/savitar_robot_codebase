@@ -39,13 +39,15 @@ void setup()
   sensors.begin();
 
   sensors.enableColourSensorReadings();
-  sensors.enableToFReadings();
+  sensors.disableToFReadings();
+  sensors.set_steering_mode(STEERING_OFF);
 
   systick.begin();
   reporter.begin();
   servos.begin();
 
-  switches.enableSimulation(true); // will accept serial inputs as switch data (until switches are connected)
+
+  //switches.enableSimulation(true); // will accept serial inputs as switch data (until switches are connected)
 
   // systick.enableSlowMode(false);
   // calibaration.calibrateSensors();
@@ -56,14 +58,12 @@ void setup()
   // nvs.saveCalibrationData();
 
   //nvs.loadCalibrationData();
-  systick.enableSlowMode(true);
-  printer.printCalibrationData();
-  motion.reset_drive_system();
-  sensors.setFollowingColor(Sensors::WHITE);
+
 }
 
 void loop()
 {
+  robot.detectBarCode();
   // sensors.set_steering_mode(STEERING_OFF);
   
   // robot.turn_left();

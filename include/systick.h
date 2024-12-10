@@ -33,9 +33,9 @@ public:
                       {
                           encoders.update();
                           sensors.update();
-                          //motion.update();
-                          //motors.update(motion.velocity(), motion.omega(), sensors.get_steering_adjustment());
-                          motors.update(100, 0, 0);
+                          motion.update();
+                          motors.update(motion.velocity(), motion.omega(), sensors.get_steering_adjustment());
+                          //motors.update(100, 0, 0);
                           //reporter.send();
 
                           //printer.printTimeDiff();
