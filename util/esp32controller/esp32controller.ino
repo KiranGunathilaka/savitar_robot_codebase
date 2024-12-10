@@ -35,15 +35,18 @@ typedef struct receivePacket
   float tof4;
   float tof5;
 
-  float speedFront;
-  float omegaFront;
-  float speedBack;
-  float omegaBack;
+  float fwdKp1;
+  float fwdKd1;
+  float rotKp1;
+  float rotKd1;
 
-  float distanceBack;
-  float distanceFront;
-  float angleBack;
-  float angleFront;
+  float fwdKp2;
+  float fwdKd2;
+  float rotKp2;
+  float rotKd2;
+
+  float steeringKp;
+  float steeringKd;
 
   bool servoGripper;
   bool servoLift;
@@ -142,6 +145,7 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len)
 
   //speeds and omegas of the two pairs
   Serial.printf("%f %f %f %f  ", receiveData.speedBack, receiveData.speedFront, receiveData.omegaBack, receiveData.omegaFront);
+
 
   //indicate wheteher servo is on or off
   Serial.printf("%b %b \n", receiveData.servoGripper, receiveData.servoLift);
