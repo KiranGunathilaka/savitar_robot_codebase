@@ -100,4 +100,47 @@ public:
             delay(systick.getLoopTime() * 1000);
         }
     }
+
+    int detectBarCode()
+    {
+        int code = 0;
+
+        motion.reset_drive_system();
+        sensors.set_steering_mode(STEERING_OFF);
+        systick.enableSlowMode(false);
+        motion.start_move(2000, 50, 0, 1000);
+
+        float distance = 0;
+        bool startTrackingWhite = false;
+        bool barcodeStarted = false;
+
+        while (!motion.move_finished())
+        {
+            bool leftBlack = sensors.sensorColors[0] == Sensors::BLACK;
+            bool rightBlack = sensors.sensorColors[4] == Sensors::BLACK;
+            bool leftWhite = sensors.sensorColors[0] == Sensors::WHITE;
+            bool rightWhite = sensors.sensorColors[4] == Sensors::WHITE;
+
+            if (leftBlack && rightBlack)
+            {
+                if (!barcodeStarted)
+                {
+                    barcodeStarted = true;
+                }
+                else if (barcodeStarted && startTrackingWhite)
+                {
+                    distance = encoders.robotDistanceBack() - distance;
+                    Serial.println(distance);
+                    startTrackingWhite = false;
+                }
+            }
+            else if (leftWhite && rightWhite && barcodeStarted && !startTrackingWhite)
+            {
+                distance = encoders.robotDistanceBack();
+                startTrackingWhite = true;
+            }
+        }
+
+        return code;
+    }
 };
