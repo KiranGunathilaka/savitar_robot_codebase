@@ -75,7 +75,7 @@ void loop()
   
   // motion.move(1200, 200, 0, 1000);
 
-  // delay(2000);
+ // delay(2000);
 
   // motion.move(-1200, 200, 0, 1000);
 
