@@ -8,6 +8,7 @@
 #include "printer.h"
 #include "config.h"
 #include "motion.h"
+#include "reporting.h"
 
 class Systick;
 extern Systick systick;
@@ -32,14 +33,16 @@ public:
                       {
                           encoders.update();
                           sensors.update();
-                          motion.update();
+                          //motion.update();
                           //motors.update(motion.velocity(), motion.omega(), sensors.get_steering_adjustment());
+                          motors.update(100, 0, 0);
+                          //reporter.send();
 
-                          printer.printTimeDiff();
-                          // printer.printTof();
-                          printer.printAllColors(true);
+                          //printer.printTimeDiff();
+                          //printer.printTof(true);
+                          //printer.printAllColors(true);
                           //printer.printEncoderCounts();
-                          // printer.printSteeringAdjustment(false);
+                          //printer.printSteeringAdjustment(false);
                           //printer.printMotorFeedPercentages(true);
                       });
     }
