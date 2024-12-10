@@ -109,14 +109,15 @@ public:
 
     void printTof(bool newline = false)
     {
+        Serial.print("Right: ");
         Serial.print(sensors.right_tof);
-        Serial.print(" ");
+        Serial.print(" Left: ");
         Serial.print(sensors.left_tof);
-        Serial.print(" ");
+        Serial.print(" Front: ");
         Serial.print(sensors.front_tof);
-        Serial.print(" ");
+        Serial.print(" Center_Bottom: ");
         Serial.print(sensors.center_bottom_tof);
-        Serial.print(" ");
+        Serial.print(" Center_Top: ");
         Serial.print(sensors.center_top_tof);
 
         if (newline)

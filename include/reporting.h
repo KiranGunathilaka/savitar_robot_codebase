@@ -95,8 +95,6 @@ public:
             motors.rotKdBack = instance->command.rotKd1;
             Serial.print(motors.rotKdBack);
 
-
-
             Serial.print(" FWD KP: ");
             motors.fwdKpFront = instance->command.fwdKp2;
             Serial.print(motors.fwdKpBack);
@@ -113,8 +111,6 @@ public:
             motors.rotKdFront = instance->command.rotKd2;
             Serial.print(motors.rotKdBack);
 
-
-
             Serial.print("Steer KP  ");
             sensors.steering_kp = instance->command.steeringKp;
             Serial.print(sensors.steering_kp);
@@ -122,7 +118,6 @@ public:
             Serial.print("  steer KD  ");
             sensors.steering_kd = instance->command.steeringKd;
             Serial.print(sensors.steering_kd);
-
         }
     }
 
@@ -179,7 +174,6 @@ public:
         transmitData.tof4 = sensors.center_bottom_tof;
         transmitData.tof5 = sensors.center_top_tof;
 
-
         transmitData.angleBack = encoders.robotAngleBack();
         transmitData.angleFront = encoders.robotAngleFront();
 
@@ -189,12 +183,18 @@ public:
         transmitData.servoGripper = servos.isServoGripOn;
         transmitData.servoLift = servos.isServoLiftOn;
 
-
         // Send message via ESP-NOW
-        esp_now_send(broadcastAddress, (uint8_t *)&transmitData, sizeof(transmitData));
+        esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&transmitData, sizeof(transmitData));
+
+        if (result == ESP_OK)
+        {
+            Serial.println("Sent with success");
+        }
+        else
+        {
+            Serial.println("Error sending the data");
+        }
     }
-
-
 };
 
 #endif
