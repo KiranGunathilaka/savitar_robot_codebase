@@ -32,7 +32,7 @@ public:
         ticker.attach(tickerTime, []()
                       {
                           encoders.update();
-                          //sensors.update();
+                          sensors.update();
                           //motion.update();
                           //motors.update(motion.velocity(), motion.omega(), sensors.get_steering_adjustment());
                           motors.update(100, 0, 0);

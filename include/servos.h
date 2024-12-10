@@ -20,28 +20,50 @@ public:
     void begin()
     {
         servoGripper.attach(SERVO_GRIPPER_PIN);
-        servoGripper.attach(SERVO_LIFT_PIN);
+        servoLift.attach(SERVO_LIFT_PIN);
     }
 
-    void liftGripper()
+    void liftBox()
     {
-        servoLift.write(120);
-        delay(200);
+        while(sensors.center_top_tof >= 50){
+            servoLift.write(120);
+            delay(50);
+        }
         servoLift.write(90);
-        delay(200);
-        servoLift.write(60);
-        delay(200);
+    }
+
+    void liftToMeasure15()
+    {
+        while(sensors.center_top_tof >= 20){
+            servoLift.write(120);
+            delay(50);
+        }
+        servoLift.write(90);
+    }
+
+
+    void liftToMeasure15()
+    {
+        while(sensors.center_top_tof >= 20){
+            servoLift.write(120);
+            delay(50);
+        }
+        servoLift.write(90);
     }
 
     void openArms()
     {
-        servoGripper.write(180);
-        delay(1000);
-        servoGripper.write(90);
-        delay(1000);
-        servoGripper.write(50);
+        servoGripper.write(OPEN_ARM_ANGLE);
         delay(1000);
     }
+
+    void closeArms()
+    {
+        servoGripper.write(CLOSE_ARM_ANGLE);
+        delay(1000);
+    }
+
+
 };
 
 extern Servos servos;

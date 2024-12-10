@@ -47,7 +47,7 @@ public:
     int prevLeft, prevRight, prevFront, prevCenterTop, prevCenterBottom;
     volatile int left_tof, right_tof, front_tof, center_top_tof, center_bottom_tof;
 
-    const int tofOffset[5] = {-10, -16, -10, -15, -10}; // adjust these values
+    const int tofOffset[5] = {-45, -84, -75, -35, -40}; // adjust these values
 
     float steering_kp = STEERING_KP;
     float steering_kd = STEERING_KD;
@@ -65,12 +65,53 @@ public:
     bool sensorsOnLine[5] = {false, false, false, false, false}; // stores whether each sensor detected the currently following color
     Colors sensorColors[5] = {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN};
 
-    int whiteThreshold[5][2] = {{538, 534}, {534, 534}, {534, 534}, {580, 550}, {534, 534}};
-    float redToGreenOffset[5][2] = {{0.422, 0.416}, {0.377, 0.376}, {0.372, 0.380}, {0.414, 0.409}, {0.357, 0.364}};
-    float redToBlueOffset[5][2] = {{0.47, 0.464}, {0.429, 0.428}, {0.423, 0.435}, {0.461, 0.456}, {0.422, 0.429}};
-    float blueToRedOffset[5][2] = {{0.1036, 0.0991}, {0.1185, 0.1247}, {0.1161, 0.1106}, {0.1161, 0.1106}, {0.1161, 0.1106}};
-    float blueToGreenOffset[5][2] = {{0.0704, 0.0674}, {0.0704, 0.0674}, {0.0704, 0.0674}, {0.0704, 0.0674}, {0.0704, 0.0674}};
-    int blackThreshold[5][2] = {{53, 53}, {72, 70}, {89, 88}, {62, 62}, {59, 68}};
+    int whiteThreshold[5][2] = {
+        {540, 540}, // S1
+        {570, 570}, // S2
+        {570, 570}, // S3
+        {649, 647}, // S4
+        {570, 570}  // S5
+    };
+
+    float redToGreenOffset[5][2] = {
+        {0.599490, 0.566074}, // S1
+        {0.542581, 0.543479}, // S2
+        {0.498909, 0.503850}, // S3
+        {0.522694, 0.501831}, // S4
+        {0.479660, 0.503628}  // S5
+    };
+
+    float redToBlueOffset[5][2] = {
+        {0.614779, 0.581825}, // S1
+        {0.567570, 0.567938}, // S2
+        {0.519522, 0.524693}, // S3
+        {0.543636, 0.524530}, // S4
+        {0.518243, 0.539005}  // S5
+    };
+
+    float blueToRedOffset[5][2] = {
+        {0.219047, 0.224885}, // S1
+        {0.230134, 0.230686}, // S2
+        {0.244253, 0.242867}, // S3
+        {0.225713, 0.240311}, // S4
+        {0.235720, 0.225616}  // S5
+    };
+
+    float blueToGreenOffset[5][2] = {
+        {0.145846, 0.149438}, // S1
+        {0.152270, 0.150201}, // S2
+        {0.145268, 0.145711}, // S3
+        {0.128300, 0.143018}, // S4
+        {0.129262, 0.127089}  // S5
+    };
+
+    int blackThreshold[5][2] = {
+        {34, 32}, // S1
+        {42, 40}, // S2
+        {41, 41}, // S3
+        {48, 49}, // S4
+        {48, 48}  // S5
+    };
 
     Colors followingColor = WHITE;
 
@@ -118,7 +159,7 @@ public:
         tofEnabled = true;
     }
 
-        void disableToFReadings()
+    void disableToFReadings()
     {
         tofEnabled = false;
     }
@@ -172,11 +213,10 @@ public:
         {
 
             prevRight = right_tof;
-            right_tof = (float)(prevRight + tofRight.readRangeContinuousMillimeters() + tofOffset[1]) / 2.0;
-
+            right_tof = (float)(prevRight + tofRight.readRangeContinuousMillimeters() + tofOffset[0]) / 2.0;
 
             prevLeft = left_tof;
-            left_tof = (prevLeft + tofLeft.readRangeContinuousMillimeters() + tofOffset[0]) / 2.0;
+            left_tof = (prevLeft + tofLeft.readRangeContinuousMillimeters() + tofOffset[1]) / 2.0;
 
             prevFront = front_tof;
             front_tof = (prevFront + tofFront.readRangeContinuousMillimeters() + tofOffset[2]) / 2.0;
@@ -213,7 +253,7 @@ public:
                 Colors color = sensors.classifyColor(t - 3, r_ratio, g_ratio, b_ratio, lux);
                 sensorColors[t - 3] = color;
 
-                // Serial.printf(" r: %f g: %f b: %f c: %d lux:%d ", r_ratio, g_ratio, b_ratio, c, lux);
+                //Serial.printf(" r: %f g: %f b: %f c: %d lux:%d ", r_ratio, g_ratio, b_ratio, c, lux);
 
                 if (followingColor == color && steering_mode == STEER_NORMAL)
                 {
@@ -224,6 +264,7 @@ public:
                 cross_track_error = error;
                 calculate_steering_adjustment();
             }
+            //Serial.println("");
         }
     }
 
@@ -256,11 +297,11 @@ public:
         else
         {
 
-            if (lux > whiteThreshold[sensor][modeIndex] * 0.6)
+            if (lux > whiteThreshold[sensor][modeIndex] * 0.9 && g > 0.5 && b > 0.4)
             {
                 return WHITE;
             }
-            else if (r > g + redToGreenOffset[sensor][modeIndex] * 0.7 && r > b + redToBlueOffset[sensor][modeIndex] * 0.7)
+            else if (r > g + redToGreenOffset[sensor][modeIndex] * 0.5 && r > b + redToBlueOffset[sensor][modeIndex] * 0.5)
             {
                 return RED;
             }
@@ -268,7 +309,7 @@ public:
             {
                 return BLUE;
             }
-            else if (lux < blackThreshold[sensor][modeIndex] * 1.4)
+            else if (lux < blackThreshold[sensor][modeIndex] * 1.3)
             {
                 return BLACK;
             }
@@ -297,7 +338,7 @@ public:
         isWire0Init = true;
         Wire.setClock(400000);
 
-        delay(200); 
+        delay(200);
 
         tofRight.setBus(&Wire);
         tofLeft.setBus(&Wire);

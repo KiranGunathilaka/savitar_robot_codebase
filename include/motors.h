@@ -78,14 +78,14 @@ public:
 
   void setupPWM()
   {
-    ledcSetup(0, 5000, PWM_RESOLUTION_BITS); // check for different pwm frequencies
-    ledcAttachPin(LEFT_BACK_MOTOR_PWM, 0);
-    ledcSetup(1, 5000, PWM_RESOLUTION_BITS);
-    ledcAttachPin(RIGHT_BACK_MOTOR_PWM, 1);
-    ledcSetup(2, 5000, PWM_RESOLUTION_BITS);
-    ledcAttachPin(LEFT_FRONT_MOTOR_PWM, 2);
-    ledcSetup(3, 5000, PWM_RESOLUTION_BITS);
-    ledcAttachPin(RIGHT_FRONT_MOTOR_PWM, 3);
+    ledcSetup(LEFT_BACK_PWM_CHANNEL, 5000, PWM_RESOLUTION_BITS); // check for different pwm frequencies
+    ledcAttachPin(LEFT_BACK_MOTOR_PWM, LEFT_BACK_PWM_CHANNEL);
+    ledcSetup(RIGHT_BACK_PWM_CHANNEL , 5000, PWM_RESOLUTION_BITS);
+    ledcAttachPin(RIGHT_BACK_MOTOR_PWM, RIGHT_BACK_PWM_CHANNEL );
+    ledcSetup(LEFT_FRONT_PWM_CHANNEL, 5000, PWM_RESOLUTION_BITS);
+    ledcAttachPin(LEFT_FRONT_MOTOR_PWM, LEFT_FRONT_PWM_CHANNEL);
+    ledcSetup(RIGHT_FRONT_PWM_CHANNEL, 5000, PWM_RESOLUTION_BITS);
+    ledcAttachPin(RIGHT_FRONT_MOTOR_PWM, RIGHT_FRONT_PWM_CHANNEL);
   }
 
   void reset_controllers()
@@ -347,13 +347,13 @@ public:
     {
       digitalWrite(LEFT_BACK_MOTOR_IN1, HIGH);
       digitalWrite(LEFT_BACK_MOTOR_IN2, LOW);
-      ledcWrite(0, -pwm);
+      ledcWrite(LEFT_BACK_PWM_CHANNEL, -pwm);
     }
     else
     {
       digitalWrite(LEFT_BACK_MOTOR_IN1, LOW);
       digitalWrite(LEFT_BACK_MOTOR_IN2, HIGH);
-      ledcWrite(0, pwm);
+      ledcWrite(LEFT_BACK_PWM_CHANNEL, pwm);
     }
   }
 
@@ -364,13 +364,13 @@ public:
     {
       digitalWrite(RIGHT_BACK_MOTOR_IN1, HIGH);
       digitalWrite(RIGHT_BACK_MOTOR_IN2, LOW);
-      ledcWrite(1, -pwm);
+      ledcWrite(RIGHT_BACK_PWM_CHANNEL , -pwm);
     }
     else
     {
       digitalWrite(RIGHT_BACK_MOTOR_IN1, LOW);
       digitalWrite(RIGHT_BACK_MOTOR_IN2, HIGH);
-      ledcWrite(1, pwm);
+      ledcWrite(RIGHT_BACK_PWM_CHANNEL , pwm);
     }
   }
 
@@ -381,13 +381,13 @@ public:
     {
       digitalWrite(LEFT_FRONT_MOTOR_IN1, HIGH);
       digitalWrite(LEFT_FRONT_MOTOR_IN2, LOW);
-      ledcWrite(2, -pwm);
+      ledcWrite(LEFT_FRONT_PWM_CHANNEL, -pwm);
     }
     else
     {
       digitalWrite(LEFT_FRONT_MOTOR_IN1, LOW);
       digitalWrite(LEFT_FRONT_MOTOR_IN2, HIGH);
-      ledcWrite(2, pwm);
+      ledcWrite(LEFT_FRONT_PWM_CHANNEL, pwm);
     }
   }
 
@@ -398,13 +398,13 @@ public:
     {
       digitalWrite(RIGHT_FRONT_MOTOR_IN1, HIGH);
       digitalWrite(RIGHT_FRONT_MOTOR_IN2, LOW);
-      ledcWrite(3, -pwm);
+      ledcWrite(RIGHT_FRONT_PWM_CHANNEL, -pwm);
     }
     else
     {
       digitalWrite(RIGHT_FRONT_MOTOR_IN1, LOW);
       digitalWrite(RIGHT_FRONT_MOTOR_IN2, HIGH);
-      ledcWrite(3, pwm);
+      ledcWrite(RIGHT_FRONT_PWM_CHANNEL, pwm);
     }
   }
 
