@@ -2,11 +2,10 @@
 #include <WiFi.h>
 
 // REPLACE WITH THE MAC ADDRESS OF YOUR ESP01S RECEIVER
-uint8_t receiverMac[] = {0xD8, 0x3B, 0xDA, 0XA3, 0x88, 0x20};
+uint8_t receiverMac[] = { 0xD8, 0x3B, 0xDA, 0XA3, 0x88, 0x20 };
 
 // Structure to hold the data to be sent
-typedef struct sendPacket
-{
+typedef struct sendPacket {
   float fwdKp1;
   float fwdKd1;
   float rotKp1;
@@ -21,8 +20,7 @@ typedef struct sendPacket
   float steeringKd;
 } sendPacket;
 
-typedef struct receivePacket
-{
+typedef struct receivePacket {
   int cs1;
   int cs2;
   int cs3;
@@ -35,21 +33,20 @@ typedef struct receivePacket
   float tof4;
   float tof5;
 
-  float fwdKp1;
-  float fwdKd1;
-  float rotKp1;
-  float rotKd1;
+  float speedFront;
+  float omegaFront;
+  float speedBack;
+  float omegaBack;
 
-  float fwdKp2;
-  float fwdKd2;
-  float rotKp2;
-  float rotKd2;
-
-  float steeringKp;
-  float steeringKd;
+  float distanceBack;
+  float distanceFront;
+  float angleBack;
+  float angleFront;
 
   bool servoGripper;
   bool servoLift;
+
+  int barcode;
 } receivePacket;
 
 sendPacket sendData;
@@ -57,16 +54,14 @@ receivePacket receiveData;
 
 esp_now_peer_info_t peerInfo;
 
-void setup()
-{
+void setup() {
   Serial.begin(115200);
 
   // Set the device in station mode
   WiFi.mode(WIFI_STA);
 
   // Initalize ESP-NOW
-  if (esp_now_init() != ESP_OK)
-  {
+  if (esp_now_init() != ESP_OK) {
     Serial.println("Error initializing ESP-NOW");
     return;
   }
@@ -81,29 +76,26 @@ void setup()
   peerInfo.channel = 0;
   peerInfo.encrypt = false;
 
-  if (esp_now_add_peer(&peerInfo) != ESP_OK)
-  {
+  if (esp_now_add_peer(&peerInfo) != ESP_OK) {
     Serial.println("Failed to add peer");
     return;
   }
 }
 
-void loop()
-{
+void loop() {
 
-  if (Serial.available() > 0)
-  {
+  if (Serial.available() > 0) {
     // Read the data from the serial port
     sendData.fwdKp1 = Serial.parseFloat();
-    sendData.fwdKp1 = Serial.parseFloat();
+    sendData.fwdKp2 = Serial.parseFloat();
 
-    sendData.fwdKd1= Serial.parseFloat();
-    sendData.fwdKd1= Serial.parseFloat();
+    sendData.fwdKd1 = Serial.parseFloat();
+    sendData.fwdKd2 = Serial.parseFloat();
 
     sendData.rotKp1 = Serial.parseFloat();
-    sendData.rotKp1 = Serial.parseFloat();
+    sendData.rotKp2 = Serial.parseFloat();
 
-    sendData.rotKd2 = Serial.parseFloat();
+    sendData.rotKd1 = Serial.parseFloat();
     sendData.rotKd2 = Serial.parseFloat();
 
     sendData.steeringKp = Serial.parseFloat();
@@ -116,38 +108,51 @@ void loop()
 }
 
 // Callback function for sent data
-void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
-{
-  if (status == ESP_NOW_SEND_SUCCESS)
-  {
+void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+  if (status == ESP_NOW_SEND_SUCCESS) {
     Serial.println("SEND_OK");
-  }
-  else
-  {
+  } else {
     Serial.println("SEND_FAIL");
   }
 }
 
+String getColor(int color) {
+  switch (color) {
+    case 0:
+      return "WHITE";
+    case 1:
+      return "RED";
+    case 2:
+      return "BLUE";
+    case 3:
+      return "BLACK";
+    case 4:
+      return "UNKNOWN";
+    default:
+      return "INVALID";
+  }
+}
+
 // Callback function for received data
-void OnDataRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len)
-{
+void OnDataRecv(const uint8_t *mac_addr, const uint8_t *data, int data_len) {
   memcpy(&receiveData, data, sizeof(receiveData));
 
   //these are colour sensor serial prints, integer corresponds to a colour
-  //0 white , 1 Red , 2 blue, 3 black , 4 unkonwn 
-  Serial.printf("%d %d %d %d %d  ", receiveData.cs1, receiveData.cs2, receiveData.cs3, receiveData.cs4, receiveData.cs5);
+  //0 white , 1 Red , 2 blue, 3 black , 4 unkonwn
+  Serial.printf("1:%7s 2:%7s 3:%7s 4:%7s 5:%7s    ", getColor(receiveData.cs1).c_str(), getColor(receiveData.cs2).c_str(), getColor(receiveData.cs3).c_str(), getColor(receiveData.cs4).c_str(), getColor(receiveData.cs5).c_str());
 
   //these are tof distance data
-  Serial.printf("%f %f %f %f %f  ", receiveData.tof1, receiveData.tof2, receiveData.tof3, receiveData.tof4, receiveData.tof5);
+  Serial.printf("L: %5.1f  R: %5.1f  C: %5.1f  GR: %5.1f  LH: %5.1f    ", receiveData.tof1, receiveData.tof2, receiveData.tof3, receiveData.tof4, receiveData.tof5);
 
   //odometry data, each value are in pairs as these are calculated and processed pairwise (front pair, back pair)
-  Serial.printf("%f %f %f %f  ", receiveData.distanceBack, receiveData.distanceFront, receiveData.angleBack, receiveData.angleFront);
+  Serial.printf("DistB: %5.1f DistF: %5.1f AngleB: %5.1f AngleF: %5.1f     ", receiveData.distanceBack, receiveData.distanceFront, receiveData.angleBack, receiveData.angleFront);
 
   //speeds and omegas of the two pairs
-  Serial.printf("%f %f %f %f  ", receiveData.speedBack, receiveData.speedFront, receiveData.omegaBack, receiveData.omegaFront);
+  Serial.printf("SpdB: %5.1f SpdF: %5.1f OmgB: %5.1f OmgF: %5.1f    ", receiveData.speedBack, receiveData.speedFront, receiveData.omegaBack, receiveData.omegaFront);
 
 
   //indicate wheteher servo is on or off
-  Serial.printf("%b %b \n", receiveData.servoGripper, receiveData.servoLift);
+  Serial.printf("GrpSrvo: %d LftSrvo: %d   ", receiveData.servoGripper, receiveData.servoLift);
 
+  Serial.printf("%d  \n", receiveData.barcode);
 }

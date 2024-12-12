@@ -5,6 +5,7 @@ import threading
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
+import queue
 
 class SavitarRobotGUI:
     def __init__(self, master, serial_port, baud_rate):
@@ -44,11 +45,25 @@ class SavitarRobotGUI:
 
         # Start Serial Data Thread
         self.start_serial_thread()
+        
+        # Schedule periodic queue checking
+        self.root.after(50, self.process_serial_queue)
 
     def start_serial_thread(self):
         # Create a thread for receiving serial data
         self.serial_thread = threading.Thread(target=self.receive_serial_data, daemon=True)
         self.serial_thread.start()
+
+    def process_serial_queue(self):
+        try:
+            while not self.data_queue.empty():
+                data = self.data_queue.get_nowait()
+                self.update_ui_with_data(data)
+        except queue.Empty:
+            pass
+        
+        # Reschedule the queue checking
+        self.root.after(50, self.process_serial_queue)
 
     def update_color_boxes(self):
         # Add method to update color boxes based on sensor data
@@ -56,12 +71,11 @@ class SavitarRobotGUI:
             color = var.get().lower()
             # Map color strings to actual colors or use a default
             color_map = {
-                'red': 'red', 
-                'blue': 'blue', 
-                'green': 'green', 
-                'yellow': 'yellow', 
-                'black': 'black', 
-                'white': 'white'
+                '0': 'white',
+                '1': 'red', 
+                '2': 'blue', 
+                '3': 'black', 
+                '4': 'unknown'
             }
             box_color = color_map.get(color, 'gray')
 
@@ -208,8 +222,9 @@ class SavitarRobotGUI:
         tof_frame = ttk.LabelFrame(parent, text="TOF Sensors")
         tof_frame.grid(row=1, column=0, padx=10, pady=10, sticky=tk.EW)
         
+        tofArr = ["Left ToF", "Front ToF", "Right ToF", "Gripper ToF" , "Lift ToF"]
         for i in range(5):
-            ttk.Label(tof_frame, text=f"TOF{i+1}:", font=('Helvetica', 12)).grid(row=i, column=0, padx=10, pady=5)
+            ttk.Label(tof_frame, text= tofArr[i], font=('Helvetica', 12)).grid(row=i, column=0, padx=10, pady=5)
             ttk.Label(
                 tof_frame, 
                 textvariable=self.tof_vars[i], 

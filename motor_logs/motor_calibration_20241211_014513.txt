@@ -1,0 +1,39 @@
+TCA Port #3
+Failed to initialize sensor 1
+TCA Port #4
+Failed to initialize sensor 2
+TCA Port #5
+Failed to initialize sensor 3
+TCA Port #6
+Failed to initialize sensor 4
+TCA Port #7
+Failed to initialize sensor 5
+[ 15423][E][Wire.cpp:513] requestFrom(): i2cRead returned Error -1
+[ 15509][E][Wire.cpp:513] requestFrom(): i2cRead returned Error -1
+[ 15517][E][Wire.cpp:513] requestFrom(): i2cRead returned Error -1
+ToF addresses set
+[ 15859][E][Wire.cpp:513] requestFrom(): i2cRead returned Error -1
+[ 15865][E][Wire.cpp:513] requestFrom(): i2cRead returned Error -1
+[ 15871][E][Wire.cpp:513] requestFrom(): i2cRead returned Error -1
+[ 15877][E][Wire.cpp:513] requestFrom(): i2cRead returned Error -1
+[ 15884][E][Wire.cpp:513] requestFrom(): i2cRead returned Error -1
+[ 15890][E][Wire.cpp:513] requestFrom(): i2cRead returned Error -1
+Guru Meditation Error: Core  1 panic'ed (IntegerDivideByZero). Exception was unhandled.
+
+Core  1 register dump:
+PC      : 0x42005ab1  PS      : 0x00060a30  A0      : 0x82005b16  A1      : 0x3fcebe90
+A2      : 0x00000000  A3      : 0x00000000  A4      : 0x3fcebeb8  A5      : 0x00000097
+A6      : 0x00000001  A7      : 0xffffffff  A8      : 0x00d4dc30  A9      : 0x3fcebe70
+A10     : 0x00000000  A11     : 0x003a2f00  A12     : 0x3fced129  A13     : 0x3fcf4b90
+A14     : 0x00060023  A15     : 0x00000003  SAR     : 0x00000001  EXCCAUSE: 0x00000006
+EXCVADDR: 0x00000000  LBEG    : 0x400556d5  LEND    : 0x400556e5  LCOUNT  : 0xfffffffd
+
+
+Backtrace: 0x42005aae:0x3fcebe90 0x42005b13:0x3fcebeb0 0x420034c7:0x3fcebef0 0x4200482e:0x3fcebf10 0x4200b6da:0x3fcebf40
+
+
+
+
+ELF file SHA256: 2569be034633604e
+
+Rebooting...

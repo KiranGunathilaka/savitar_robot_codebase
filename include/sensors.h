@@ -63,7 +63,7 @@ public:
 
     Adafruit_TCS34725 *colourSensorArr[5];
     bool sensorsOnLine[5] = {false, false, false, false, false}; // stores whether each sensor detected the currently following color
-    Colors sensorColors[5] = {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN};
+    Colors sensorColors[5] = {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN};  //right to left
 
     int whiteThreshold[5][2] = {
         {540, 540}, // S1

@@ -33,7 +33,7 @@ const int RIGHT_FRONT_MOTOR_IN2 = 2;
 const int RIGHT_FRONT_MOTOR_PWM = 1;
 
 const int PULSES_PER_ROTATION = 1495; // encoder pulse count for rotation, all have same values for 20 rotations (1494, 1495, 1496, 1497 averages)
-const int WHEEL_DIAMETER_BACK = 65;
+const int WHEEL_DIAMETER_BACK = 63;
 const int WHEEL_DIAMETER_FRONT = 63;
 const float WHEEL_GAP = 189.5; // distance between the wheels in mm
 const float MM_PER_ROTATION_BACK = WHEEL_DIAMETER_BACK * PI;
@@ -103,7 +103,7 @@ const int TOF_CENTER_BOTTOM_ADD = 0x34;
 
 const float STEERING_KP = 90.0;             //working values speed - 70 Kp - 90 Kd - 25
 const float STEERING_KD =25.0;
-const float SENSOR_WEIGHTS[5] = {-2.0, -1.0, 0.0, 1.0, 2.0};
+const float SENSOR_WEIGHTS[5] = {2.0, 1.0, 0.0, -1.0, -2.0};
 
 //*************************************************************CALIBRATION******************************************
 
@@ -123,10 +123,11 @@ const int SWITCH_PIN = 7;
 const int OMEGA = 540;
 const int ALPHA = 3600;
 
+const int BARCODE_THRESHOLD_DISTANCE = 43;
 
 //***********************************************************REPORTING*********************************************
 
-const uint8_t broadcastAddress[] = { 0xFC, 0xB4, 0x67, 0XF5, 0x62, 0x78 };
+const uint8_t broadcastAddress[] = { 0xCC, 0xDB, 0xA7, 0X33, 0x1D, 0x00 };
 
 //**********************************************************SERVOS*************************************************
 
@@ -138,3 +139,11 @@ const int CLOSE_ARM_ANGLE = 153;
 
 //***********************************************************ROBOT*************************************************
 
+
+
+//***********************************************************UTILS**************************************************
+
+const int RGB_PIN =  38;      
+const int NUM_PIXELS = 1; 
+   
+const int EM_PIN = 41;

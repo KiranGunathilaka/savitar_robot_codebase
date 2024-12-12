@@ -3,9 +3,9 @@
 #include "Arduino.h"
 #include "config.h"
 #include "motion.h"
-#include "reporting.h"
 #include "sensors.h"
 #include "systick.h"
+#include "reporting.h"
 #include "nvs.h"
 
 class Robot;
@@ -14,6 +14,8 @@ extern Robot robot;
 class Robot
 {
 public:
+    int code = 0;
+
     void follow_Color_line()
     {
         systick.enableSlowMode(true);
@@ -101,14 +103,14 @@ public:
         }
     }
 
-    int detectBarCode()
+    uint16_t detectBarCode()
     {
-        int code = 0;
+        uint16_t code = 0;
 
         motion.reset_drive_system();
         sensors.set_steering_mode(STEERING_OFF);
         systick.enableSlowMode(false);
-        motion.start_move(2000, 50, 0, 1000);
+        motion.start_move(2000, 100, 0, 1000);
 
         float distance = 0;
         bool startTrackingWhite = false;
@@ -130,8 +132,15 @@ public:
                 else if (barcodeStarted && startTrackingWhite)
                 {
                     distance = encoders.robotDistanceBack() - distance;
-                    Serial.println(distance);
                     startTrackingWhite = false;
+                    if (distance > BARCODE_THRESHOLD_DISTANCE)
+                    {
+                        code = (code << 1) | 1;
+                    }
+                    else
+                    {
+                        code = (code << 1);
+                    }
                 }
             }
             else if (leftWhite && rightWhite && barcodeStarted && !startTrackingWhite)
@@ -139,8 +148,68 @@ public:
                 distance = encoders.robotDistanceBack();
                 startTrackingWhite = true;
             }
+
+            if (code >= 7 && ((code & 0b111) == 0b000 || (code & 0b111) == 0b111))
+            {
+                break;
+            }
+        }
+        return code >> 3;
+    }
+
+    int8_t maze_entrance(int barcode)
+    {
+        motion.reset_drive_system();
+        sensors.set_steering_mode(STEERING_OFF);
+        sensors.setFollowingColor(Sensors::WHITE);
+        systick.enableSlowMode(false);
+
+        bool turnRight = false;
+        bool turnLeft = false;
+
+        motion.start_move(1000, 40, 0, 1000);
+        while (!motion.move_finished())
+        {
+            if (sensors.sensorColors[0] == Sensors::WHITE && sensors.sensorColors[1] == Sensors::WHITE)
+            {
+                turnRight = true;
+                turnLeft = false;
+                reporter.sendMsg(000);
+                break;
+            }
+            else if (sensors.sensorColors[4] == Sensors::WHITE && sensors.sensorColors[3] == Sensors::WHITE)
+            {
+                turnRight = false;
+                turnLeft = true;
+                reporter.sendMsg(333);
+                break;
+            };
+            delay(systick.getLoopTime() * 1000);
+        }
+        motion.reset_drive_system();
+
+        if (turnLeft && !turnRight)
+        {
+            reporter.sendMsg(111);
+            turn_left();
+        }
+        else if (!turnLeft && turnRight)
+        {
+            reporter.sendMsg(222);
+            turn_right();
         }
 
-        return code;
+        sensors.set_steering_mode(STEERING_OFF);
+        motion.reset_drive_system();
+        motion.start_move(1000, 100, 0, 1000);
+        while (!motion.move_finished())
+        {
+            if (sensors.sensorColors[0] == Sensors::WHITE && sensors.sensorColors[1] == Sensors::WHITE || sensors.sensorColors[4] == Sensors::WHITE && sensors.sensorColors[3] == Sensors::WHITE)
+            {
+                sensors.set_steering_mode(STEERING_OFF);
+                return barcode % 5;
+            }
+        }
+        return barcode;
     }
 };

@@ -4,7 +4,6 @@
 #include <esp_now.h>
 #include <WiFi.h>
 #include "motors.h"
-#include "sensors.h"
 #include "encoders.h"
 #include "servos.h"
 #include "config.h"
@@ -14,8 +13,9 @@ extern Reporting reporter;
 
 class Reporting
 {
+private:
+    int code =0;
 public:
-    int speed, omega;
 
     typedef struct sendData
     {
@@ -44,7 +44,9 @@ public:
         bool servoGripper;
         bool servoLift;
 
+        int barcode;
     } sendData;
+
 
     typedef struct receiveData
     {
@@ -183,17 +185,23 @@ public:
         transmitData.servoGripper = servos.isServoGripOn;
         transmitData.servoLift = servos.isServoLiftOn;
 
+        transmitData.barcode = code;
+
         // Send message via ESP-NOW
         esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&transmitData, sizeof(transmitData));
 
         if (result == ESP_OK)
         {
-            Serial.println("Sent with success");
+            //Serial.println("Sent with success");
         }
         else
         {
-            Serial.println("Error sending the data");
+            //Serial.println("Error sending the data");
         }
+    }
+
+    void sendMsg(int barcode){
+        code = barcode;
     }
 };
 
