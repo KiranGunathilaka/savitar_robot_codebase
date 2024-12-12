@@ -35,14 +35,14 @@ public:
                           sensors.update();
                           motion.update();
                           motors.update(motion.velocity(), motion.omega(), sensors.get_steering_adjustment());
-                          //motors.update(80, 0, sensors.get_steering_adjustment());
+                          //motors.update(200, 0, sensors.get_steering_adjustment());
                           reporter.send();
 
                           //printer.printTimeDiff();
                           //printer.printTof(true);
                           //printer.printAllColors(true);
                           //printer.printEncoderCounts();
-                          //printer.printSteeringAdjustment(false);
+                          //printer.printSteeringAdjustment(true);
                           //printer.printMotorFeedPercentages(true);
                       });
     }

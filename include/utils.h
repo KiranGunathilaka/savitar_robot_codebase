@@ -10,6 +10,7 @@ public:
 
     void begin() {
         pinMode(EM_PIN, OUTPUT);
+        pinMode(LED_PIN, OUTPUT);
     }
 
     void turnOnEM(){
@@ -18,6 +19,14 @@ public:
 
     void turnOffEM(){
         digitalWrite(EM_PIN , LOW);
+    }
+
+    void turnOnLED(){
+        digitalWrite(LED_PIN, HIGH);
+    }
+
+    void turnOffLED(){
+        digitalWrite(LED_PIN, LOW);
     }
 };
 

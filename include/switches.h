@@ -32,12 +32,14 @@ public:
 private:
     int realSwitchRead() {
         int analogValue = analogRead(SWITCH_PIN);
-        if (analogValue > 3412) return 1;
-        else if (analogValue > 2730) return 2;
-        else if (analogValue > 2048) return 3;
-        else if (analogValue > 1365) return 4;
-        else if (analogValue > 683) return 5;
-        else if (analogValue > 10) return 6;
+        if (analogValue > 3900) return 1;
+        else if (analogValue > 3300) return 2;
+        else if (analogValue > 2800) return 3;
+        else if (analogValue > 2300) return 4;
+        else if (analogValue > 1800) return 5;
+        else if (analogValue > 1300) return 6;
+        else if (analogValue > 800) return 7;
+        else if (analogValue > 300) return 8;
         return 0;
     }
 

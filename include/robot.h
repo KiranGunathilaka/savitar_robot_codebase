@@ -103,6 +103,19 @@ public:
         }
     }
 
+    void go_forward(int distance)
+    {
+        sensors.set_steering_mode(STEERING_OFF);
+        motion.reset_drive_system();
+
+        motion.start_move(distance, RUN_SPEED, 0, ACCELERATION);
+
+        while (!motion.move_finished())
+        {
+            delay(systick.getLoopTime() * 1000);
+        }
+    }
+
     uint16_t detectBarCode()
     {
         uint16_t code = 0;
@@ -110,7 +123,9 @@ public:
         motion.reset_drive_system();
         sensors.set_steering_mode(STEERING_OFF);
         systick.enableSlowMode(false);
-        motion.start_move(2000, 100, 0, 1000);
+        sensors.disableUnknownToFollowing();
+
+        motion.start_move(2000, READ_SPEED, 0, ACCELERATION);
 
         float distance = 0;
         bool startTrackingWhite = false;
@@ -160,56 +175,90 @@ public:
     int8_t maze_entrance(int barcode)
     {
         motion.reset_drive_system();
-        sensors.set_steering_mode(STEERING_OFF);
+        sensors.set_steering_mode(STEER_NORMAL);
         sensors.setFollowingColor(Sensors::WHITE);
         systick.enableSlowMode(false);
+        sensors.disableUnknownToFollowing();
 
         bool turnRight = false;
         bool turnLeft = false;
 
-        motion.start_move(1000, 40, 0, 1000);
+        motion.start_move(1000, RUN_SPEED, 0, ACCELERATION);
+
         while (!motion.move_finished())
         {
-            if (sensors.sensorColors[0] == Sensors::WHITE && sensors.sensorColors[1] == Sensors::WHITE)
+            if (sensors.sensorColors[0] == Sensors::WHITE)
             {
                 turnRight = true;
                 turnLeft = false;
-                reporter.sendMsg(000);
                 break;
             }
-            else if (sensors.sensorColors[4] == Sensors::WHITE && sensors.sensorColors[3] == Sensors::WHITE)
+            else if (sensors.sensorColors[4] == Sensors::WHITE)
             {
                 turnRight = false;
                 turnLeft = true;
-                reporter.sendMsg(333);
                 break;
             };
             delay(systick.getLoopTime() * 1000);
         }
+
+        go_forward(MOVE_AFTER_DETECT);
+
         motion.reset_drive_system();
 
         if (turnLeft && !turnRight)
         {
-            reporter.sendMsg(111);
             turn_left();
         }
         else if (!turnLeft && turnRight)
         {
-            reporter.sendMsg(222);
             turn_right();
         }
 
-        sensors.set_steering_mode(STEERING_OFF);
+        sensors.set_steering_mode(STEER_NORMAL);
         motion.reset_drive_system();
-        motion.start_move(1000, 100, 0, 1000);
+        motion.start_move(1000, RUN_SPEED, 0, ACCELERATION);
+
         while (!motion.move_finished())
         {
             if (sensors.sensorColors[0] == Sensors::WHITE && sensors.sensorColors[1] == Sensors::WHITE || sensors.sensorColors[4] == Sensors::WHITE && sensors.sensorColors[3] == Sensors::WHITE)
             {
                 sensors.set_steering_mode(STEERING_OFF);
+
+                motion.reset_drive_system();
                 return barcode % 5;
             }
+            delay(systick.getLoopTime() * 1000);
         }
         return barcode;
+    }
+
+    void go_forward_30()
+    {
+        go_forward(30);
+
+        sensors.set_steering_mode(STEER_NORMAL);
+        motion.reset_drive_system();
+        motion.start_move(400, RUN_SPEED, 0, ACCELERATION);
+
+        while (!motion.move_finished())
+        {
+            if (sensors.sensorColors[0] == Sensors::WHITE && sensors.sensorColors[1] == Sensors::WHITE || sensors.sensorColors[4] == Sensors::WHITE && sensors.sensorColors[3] == Sensors::WHITE)
+            {
+                sensors.set_steering_mode(STEERING_OFF);
+                motion.reset_drive_system();
+                break;
+            }
+            delay(systick.getLoopTime() * 1000);
+        }
+    }
+
+    int8_t solve_maze(int position)
+    {
+        if (position != 0)
+        {
+            
+        }
+        return 0;
     }
 };

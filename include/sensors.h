@@ -42,6 +42,7 @@ private:
 public:
     bool tofEnabled = true;
     bool colourEnabled = true;
+    bool isUnknownFollowingClr = true;
 
     VL53L0X tofRight, tofLeft, tofFront, tofCenterTop, tofCenterBottom;
     int prevLeft, prevRight, prevFront, prevCenterTop, prevCenterBottom;
@@ -153,6 +154,14 @@ public:
         return modeIndex;
     }
 
+    void enableUnknownToFollowing(){
+        isUnknownFollowingClr = true;
+    }
+
+    void disableUnknownToFollowing(){
+        isUnknownFollowingClr = false;
+    }
+
     // to not take readings and save time
     void enableToFReadings()
     {
@@ -204,7 +213,7 @@ public:
         float adjustment = (pTerm + dTerm) * encoders.getLoopTime();
 
         last_steering_error = cross_track_error;
-        steering_adjustment = adjustment;
+        steering_adjustment = abs(adjustment) > 2.0 ? adjustment>0 ? 2 :-2 : adjustment  ;
     }
 
     void update()
@@ -251,8 +260,11 @@ public:
                 float b_ratio = (float)b / c;
 
                 Colors color = sensors.classifyColor(t - 3, r_ratio, g_ratio, b_ratio, lux);
-                sensorColors[t - 3] = color;
 
+                if (isUnknownFollowingClr){
+                    color = color == UNKNOWN ? getFollowingColor() : color;
+                }
+                sensorColors[t - 3] = color;
                 //Serial.printf(" r: %f g: %f b: %f c: %d lux:%d ", r_ratio, g_ratio, b_ratio, c, lux);
 
                 if (followingColor == color && steering_mode == STEER_NORMAL)
