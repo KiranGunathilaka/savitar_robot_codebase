@@ -25,7 +25,7 @@ public:
 
         motion.reset_drive_system();
 
-        motion.start_turn(direction * (180), OMEGA, 0, ALPHA);
+        motion.start_turn(direction * (195), OMEGA, 0, ALPHA);
 
         while (!motion.turn_finished())
         {
