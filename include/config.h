@@ -125,6 +125,8 @@ const int ALPHA = 3600;
 
 const int BARCODE_THRESHOLD_DISTANCE = 43;
 
+const int ROBOT_LENGTH = 180;
+
 //***********************************************************REPORTING*********************************************
 
 const uint8_t broadcastAddress[] = { 0xCC, 0xDB, 0xA7, 0X33, 0x1D, 0x00 };

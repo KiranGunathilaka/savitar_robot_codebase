@@ -84,7 +84,9 @@ void loop()
   // robot.colorLineFollowing();
   // robot.arrangeBox(true);
 
-  robot.pickUpfromCheckpoint();
+  //robot.pickUpfromCheckpoint();
+
+  robot.go(120, false);
 
   while ((true))
   {

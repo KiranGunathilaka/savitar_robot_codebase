@@ -8,6 +8,7 @@
 #include "reporting.h"
 #include "nvs.h"
 #include "utils.h"
+#include "servos.h"
 
 class Robot;
 extern Robot robot;
@@ -29,7 +30,7 @@ public:
 
         while (!motion.turn_finished())
         {
-            delay(systick.getLoopTime() *1000);
+            delay(systick.getLoopTime() * 1000);
         }
     }
 
@@ -537,17 +538,21 @@ public:
 
         motion.start_move(300, RUN_SPEED, 0, ACCELERATION);
 
-        while(!motion.move_finished()){
+        while (!motion.move_finished())
+        {
             delayMicroseconds(systick.getLoopTime());
 
-            if(sensors.sensorColors[0] == Sensors::BLACK && sensors.sensorColors[4] == Sensors::BLACK){
+            if (sensors.sensorColors[0] == Sensors::BLACK && sensors.sensorColors[4] == Sensors::BLACK)
+            {
                 break;
             }
         }
+        motion.reset_drive_system();
+        sensors.set_steering_mode(STEERING_OFF);
 
         if (sensors.sensorColors[0] == Sensors::BLACK && sensors.sensorColors[1] == Sensors::BLACK && sensors.sensorColors[3] == Sensors::BLACK && sensors.sensorColors[4] == Sensors::BLACK)
         {
-            motion.reset_drive_system();
+            
             motion.start_turn(30, OMEGA, 0, ALPHA);
             while (!(sensors.sensorColors[0] == Sensors::BLACK && sensors.sensorColors[1] == Sensors::BLACK && sensors.sensorColors[3] == Sensors::BLACK && sensors.sensorColors[4] == Sensors::BLACK))
             {
@@ -557,5 +562,59 @@ public:
 
         motion.reset_drive_system();
 
+        motion.start_move(300, 50, 0, ACCELERATION);
+
+        while(!motion.move_finished()){
+            delay(systick.getLoopTime() * 1000);
+
+            int count = 0 ;
+            bool whiteTracked = false;
+            if (sensors.sensorColors[0] == Sensors::WHITE && sensors.sensorColors[4] == Sensors::WHITE && !whiteTracked ){
+                whiteTracked = true;
+                count++;
+            } else if (sensors.sensorColors[0] == Sensors::BLACK && sensors.sensorColors[4] == Sensors::BLACK && whiteTracked){
+                whiteTracked = false;
+            } 
+
+            if(count >= 3){
+                break;
+            }
+        }
+
+        motion.reset_drive_system();
+
+        go(ROBOT_LENGTH, true);
+
+        servos.liftUp();
+
+        bool placeCoin = false;
+        int i= 4;
+        while (sensors.sensorColors[0] == Sensors::BLACK || sensors.sensorColors[1] == Sensors::BLACK || sensors.sensorColors[2] == Sensors::BLACK ||sensors.sensorColors[3] == Sensors::BLACK || sensors.sensorColors[4] == Sensors::BLACK){
+            
+            bool turnRight = false;
+            motion.reset_drive_system();
+
+            motion.start_move(2000, RUN_SPEED, 0 , ACCELERATION);
+            while(!motion.move_finished()){
+                delay(systick.getLoopTime() * 1000);
+
+                if (sensors.sensorColors[0] == Sensors::BLACK || sensors.sensorColors[1] == Sensors::BLACK || sensors.sensorColors[2] == Sensors::BLACK ||sensors.sensorColors[3] == Sensors::BLACK || sensors.sensorColors[4] == Sensors::BLACK){
+                    placeCoin = true;
+                    break;
+                }
+                if (sensors.front_tof < 50 * ((int) i/4)){
+                    turnRight = true;
+                    break;
+                }
+            }
+            if (turnRight){
+                turn_right();
+            }
+            i++;
+        }
+        if (placeCoin){
+            utils.turnOffEM();
+        }
+        
     }
 };
