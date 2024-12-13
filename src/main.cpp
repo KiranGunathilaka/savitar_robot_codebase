@@ -84,7 +84,7 @@ void loop()
   //robot.colorLineFollowing();
   // robot.arrangeBox(true);
 
-  // robot.pickUpfromCheckpoint();
+  robot.pickUpfromCheckpoint();
 
   robot.insertChamber();
 
