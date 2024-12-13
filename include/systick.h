@@ -38,7 +38,7 @@ public:
                           //motors.update(200, 0, sensors.get_steering_adjustment());
                           reporter.send();
 
-                          //printer.printTimeDiff();
+                          printer.printTimeDiff();
                           //printer.printTof(true);
                           //printer.printAllColors(true);
                           //printer.printEncoderCounts();

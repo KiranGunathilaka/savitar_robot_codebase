@@ -213,7 +213,12 @@ public:
         float adjustment = (pTerm + dTerm) * encoders.getLoopTime();
 
         last_steering_error = cross_track_error;
-        steering_adjustment = abs(adjustment) > 2.0 ? adjustment>0 ? 2 :-2 : adjustment  ;
+        if(sensors.getModeIndex() == SLOW_MODE){
+            steering_adjustment = adjustment;
+        }else{
+            steering_adjustment = abs(adjustment) > 2.0 ? adjustment> 0 ? 2 :-2 : adjustment  ;
+        }
+        
     }
 
     void update()

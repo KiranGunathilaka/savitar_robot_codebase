@@ -75,13 +75,20 @@ void setup()
 
 void loop()
 {
-  uint16_t code = robot.detectBarCode();
+  //uint16_t code = robot.detectBarCode() >> 3;
 
-  reporter.sendMsg(code);
+  // reporter.sendMsg(code);
 
-  uint16_t mazePosition = robot.maze_entrance(code);
+  // uint16_t mazePosition = robot.maze_entrance(code);
 
-  while(true){
+  // robot.colorLineFollowing();
+  // robot.arrangeBox(true);
+
+  robot.pickUpfromCheckpoint();
+
+  while ((true))
+  {
 
   }
+
 }

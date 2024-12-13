@@ -41,14 +41,14 @@ const float MM_PER_ROTATION_FRONT = WHEEL_DIAMETER_FRONT * PI;
 const float DEG_PER_MM_DIFFERENCE = 180.0 / (PI * WHEEL_GAP); //degrees of rotation per unit difference between the left and right wheel travel distances
 
 const float FWD_KP_BACK = 1.0;
-const float FWD_KD_BACK = 1.0;
-const float ROT_KP_BACK = 4.0;
-const float ROT_KD_BACK = 0.8;
+const float FWD_KD_BACK = 0.1;
+const float ROT_KP_BACK = 15.3;
+const float ROT_KD_BACK = 1.5;
 
 const float FWD_KP_FRONT = 1.0;
-const float FWD_KD_FRONT = 1.0;
-const float ROT_KP_FRONT = 4.0;
-const float ROT_KD_FRONT = 0.8;
+const float FWD_KD_FRONT = 0.1;
+const float ROT_KP_FRONT = 15.3;
+const float ROT_KD_FRONT = 1.6;
 
 const int ROBOT_RADIUS = 115; //measure it to the absolute 1mm accuracy
 const float RADIANS_PER_DEGREE = PI / 180; 
@@ -101,8 +101,8 @@ const int TOF_FRONT_ADD = 0x32;
 const int TOF_CENTER_TOP_ADD = 0x33;
 const int TOF_CENTER_BOTTOM_ADD = 0x34;
 
-const float STEERING_KP = 70.0;             //working values speed - 70 Kp - 90 Kd - 25
-const float STEERING_KD =30.0;
+const float STEERING_KP = 5.0;             //working values speed - 70 Kp - 90 Kd - 25
+const float STEERING_KD = 1;
 const float SENSOR_WEIGHTS[5] = {2.0, 1.0, 0.0, -1.0, -2.0};
 
 //*************************************************************CALIBRATION******************************************
@@ -120,7 +120,7 @@ const int SWITCH_PIN = 7;
 
 //**************************************************************ROBOT*********************************************
 
-const int OMEGA = 540;
+const int OMEGA = 360;
 const int ALPHA = 3600;
 
 const int BARCODE_THRESHOLD_DISTANCE = 43;
@@ -134,16 +134,26 @@ const uint8_t broadcastAddress[] = { 0xCC, 0xDB, 0xA7, 0X33, 0x1D, 0x00 };
 const int SERVO_GRIPPER_PIN = 38;
 const int SERVO_LIFT_PIN = 14;
 
-const int OPEN_ARM_ANGLE = 60;
-const int CLOSE_ARM_ANGLE = 153;
+const int OPEN_ARM_ANGLE = 0;
+const int CLOSE_ARM_ANGLE = 160;
+
+const float MIN_HEIGHT  = 50;
+const float MAX_HEIGHT  = 120; //in mm
+
+const int TOF_OFFSET = 15;
 
 //***********************************************************ROBOT*************************************************
 
 const int MOVE_AFTER_DETECT = 65;
-const int RUN_SPEED = 200;
+const int RUN_SPEED = 100;
 const int ACCELERATION = 1000;
 
 const int READ_SPEED = 100;
+
+const int DIST_TO_BARRIER_FROM_LINE1 = 440;
+const int DIST_TO_BARRIER_FROM_LINE2 = 140;
+
+const int LINE_WIDTH = 40;
 
 //***********************************************************UTILS**************************************************
 const int LED_PIN =  0;      
