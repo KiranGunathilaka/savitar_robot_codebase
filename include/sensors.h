@@ -290,10 +290,10 @@ public:
 
                 calculate_steering_adjustment();
 
-                if (isInUneven)
-                {
-                    tofSteeringAdjustment();
-                }
+                // if (isInUneven)
+                // {
+                //     tofSteeringAdjustment();
+                // }
             }
             // Serial.println("");
         }
@@ -461,23 +461,23 @@ public:
         }
     }
 
-    void tofSteeringAdjustment()
-    {
-        int leftWallExist = left_tof < LEFT_WALL_ThRESHOLD;
+    // void tofSteeringAdjustment()
+    // {
+    //     int leftWallExist = left_tof < LEFT_WALL_ThRESHOLD;
 
-        float left_error = 0;
-        if (leftWallExist)
-        {
-            float left_error = left_tof - LEFT_WALL_ThRESHOLD;
-        }
+    //     float left_error = 0;
+    //     if (leftWallExist)
+    //     {
+    //         float left_error = left_tof - LEFT_WALL_ThRESHOLD;
+    //     }
 
-        float pTerm = STEERING_KP_TOF * left_error;
-        float dTerm = STEERING_KD_TOF * (left_error - last_left_error);
+    //     float pTerm = STEERING_KP_TOF * left_error;
+    //     float dTerm = STEERING_KD_TOF * (left_error - last_left_error);
 
-        float adjustment = (pTerm + dTerm) * encoders.getLoopTime();
+    //     float adjustment = (pTerm + dTerm) * encoders.getLoopTime();
 
-        last_steering_error = left_error;
+    //     last_steering_error = left_error;
 
-        steering_adjustment = adjustment;
-    }
+    //     steering_adjustment = adjustment;
+    // }
 };

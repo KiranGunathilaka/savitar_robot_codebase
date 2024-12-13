@@ -131,6 +131,7 @@ const int BARCODE_THRESHOLD_DISTANCE = 43;
 
 const int ROBOT_LENGTH = 180;
 
+const int INITIAL_BOX_DISTANCE = 310;
 //***********************************************************REPORTING*********************************************
 
 const uint8_t broadcastAddress[] = { 0xCC, 0xDB, 0xA7, 0X33, 0x1D, 0x00 };
@@ -150,7 +151,7 @@ const int TOF_OFFSET = 15;
 
 //***********************************************************ROBOT*************************************************
 
-const int MOVE_AFTER_DETECT = 65;
+const int MOVE_AFTER_DETECT = 60;
 const int RUN_SPEED = 100;
 const int ACCELERATION = 1000;
 
@@ -162,6 +163,10 @@ const int DIST_TO_BARRIER_FROM_LINE2 = 140;
 const int LINE_WIDTH = 40;
 
 const int WALL_FOLLOWING_DIATANCE = 150;
+const int BOX_BRANCH_DISTANCE = 400;
+const int MIDDLE_BOX_DISTANCE = 280;
+const int END_BOX_DISTANCE  = 320;
+const int REVERSE_DISTANCE = 40;
 
 
 //***********************************************************UTILS**************************************************
