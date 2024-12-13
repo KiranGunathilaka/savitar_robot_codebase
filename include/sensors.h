@@ -35,6 +35,7 @@ private:
     bool isWire0Init = false;
 
     float last_steering_error = 0;
+    float last_left_error = 0;
     float accumelated_steering_error = 0;
     volatile float cross_track_error;
     volatile float steering_adjustment;
@@ -43,6 +44,8 @@ public:
     bool tofEnabled = true;
     bool colourEnabled = true;
     bool isUnknownFollowingClr = true;
+
+    bool isInUneven = false;
 
     VL53L0X tofRight, tofLeft, tofFront, tofCenterTop, tofCenterBottom;
     int prevLeft, prevRight, prevFront, prevCenterTop, prevCenterBottom;
@@ -63,8 +66,8 @@ public:
     };
 
     Adafruit_TCS34725 *colourSensorArr[5];
-    bool sensorsOnLine[5] = {false, false, false, false, false}; // stores whether each sensor detected the currently following color
-    Colors sensorColors[5] = {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN};  //right to left
+    bool sensorsOnLine[5] = {false, false, false, false, false};            // stores whether each sensor detected the currently following color
+    Colors sensorColors[5] = {UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN}; // right to left
 
     int whiteThreshold[5][2] = {
         {540, 540}, // S1
@@ -154,11 +157,13 @@ public:
         return modeIndex;
     }
 
-    void enableUnknownToFollowing(){
+    void enableUnknownToFollowing()
+    {
         isUnknownFollowingClr = true;
     }
 
-    void disableUnknownToFollowing(){
+    void disableUnknownToFollowing()
+    {
         isUnknownFollowingClr = false;
     }
 
@@ -213,12 +218,14 @@ public:
         float adjustment = (pTerm + dTerm) * encoders.getLoopTime();
 
         last_steering_error = cross_track_error;
-        if(sensors.getModeIndex() == SLOW_MODE){
+        if (sensors.getModeIndex() == SLOW_MODE)
+        {
             steering_adjustment = adjustment;
-        }else{
-            steering_adjustment = abs(adjustment) > 2.0 ? adjustment> 0 ? 2 :-2 : adjustment  ;
         }
-        
+        else
+        {
+            steering_adjustment = abs(adjustment) > 2.0 ? adjustment > 0 ? 2 : -2 : adjustment;
+        }
     }
 
     void update()
@@ -266,11 +273,12 @@ public:
 
                 Colors color = sensors.classifyColor(t - 3, r_ratio, g_ratio, b_ratio, lux);
 
-                if (isUnknownFollowingClr){
+                if (isUnknownFollowingClr)
+                {
                     color = color == UNKNOWN ? getFollowingColor() : color;
                 }
                 sensorColors[t - 3] = color;
-                //Serial.printf(" r: %f g: %f b: %f c: %d lux:%d ", r_ratio, g_ratio, b_ratio, c, lux);
+                // Serial.printf(" r: %f g: %f b: %f c: %d lux:%d ", r_ratio, g_ratio, b_ratio, c, lux);
 
                 if (followingColor == color && steering_mode == STEER_NORMAL)
                 {
@@ -279,9 +287,15 @@ public:
                 }
 
                 cross_track_error = error;
+
                 calculate_steering_adjustment();
+
+                // if (isInUneven)
+                // {
+                //     tofSteeringAdjustment();
+                // }
             }
-            //Serial.println("");
+            // Serial.println("");
         }
     }
 
@@ -446,4 +460,24 @@ public:
             }
         }
     }
+
+    // void tofSteeringAdjustment()
+    // {
+    //     int leftWallExist = left_tof < LEFT_WALL_ThRESHOLD;
+
+    //     float left_error = 0;
+    //     if (leftWallExist)
+    //     {
+    //         float left_error = left_tof - LEFT_WALL_ThRESHOLD;
+    //     }
+
+    //     float pTerm = STEERING_KP_TOF * left_error;
+    //     float dTerm = STEERING_KD_TOF * (left_error - last_left_error);
+
+    //     float adjustment = (pTerm + dTerm) * encoders.getLoopTime();
+
+    //     last_steering_error = left_error;
+
+    //     steering_adjustment = adjustment;
+    // }
 };

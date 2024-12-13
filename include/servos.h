@@ -43,20 +43,19 @@ public:
     void liftUp()
     {
         servoLift.write(130);
-        delay(1000);
+        delay(500);
         servoLift.write(90);
         delay(500);
     }
 
     void liftDown(){
         servoLift.write(60);
-        delay(1500);
+        delay(800);
         servoLift.write(90);
         delay(500);
     }
 
     int detectHeight(){
-        liftUp();
         bool is5 = false;
         bool is10 = false;
         bool is15 = false;
