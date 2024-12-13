@@ -105,6 +105,10 @@ const float STEERING_KP = 14.0;             //working values speed - 70 Kp - 90 
 const float STEERING_KD = 5.5;
 const float SENSOR_WEIGHTS[5] = {2.0, 1.0, 0.0, -1.0, -2.0};
 
+const float STEERING_KD_TOF = 10.0;
+const float STEERING_KP_TOF = 1.0;
+
+const float LEFT_WALL_ThRESHOLD = 100;
 //*************************************************************CALIBRATION******************************************
 
 static const int SAMPLES_PER_CALIBRATION = 100;
@@ -156,6 +160,9 @@ const int DIST_TO_BARRIER_FROM_LINE1 = 440;
 const int DIST_TO_BARRIER_FROM_LINE2 = 140;
 
 const int LINE_WIDTH = 40;
+
+const int WALL_FOLLOWING_DIATANCE = 150;
+
 
 //***********************************************************UTILS**************************************************
 const int LED_PIN =  0;      

@@ -81,17 +81,20 @@ void loop()
 
   // uint16_t mazePosition = robot.maze_entrance(code);
 
-  //robot.colorLineFollowing();
-  // robot.arrangeBox(true);
+  //bool order = robot.colorLineFollowing();
+  bool order =true;
+  //robot.arrangeBox(order);
 
-  robot.pickUpfromCheckpoint();
+  //robot.pickUpfromCheckpoint();
 
-  robot.insertChamber();
+  //robot.insertChamber();
 
-  // while ((true))
-  // {
+  robot.unevenTerrain();
 
-  // }
+  while ((true))
+  {
+
+  }
   
   
 
