@@ -379,10 +379,6 @@ public:
         sensors.set_steering_mode(STEERING_OFF);
     }
 
-
-
-
-
     void go_28_aligning_line()
     {
         sensors.set_steering_mode(STEER_NORMAL);
@@ -399,7 +395,21 @@ public:
         go(MOVE_AFTER_DETECT, true);
     }
 
-    void go_33_end()
+    void go_33_grab()
+    {
+        sensors.set_steering_mode(STEER_NORMAL);
+        motion.start_move(BOX_BRANCH_DISTANCE, RUN_SPEED, 0, ACCELERATION);
+        while (!motion.move_finished())
+        {
+            delay(systick.getLoopTime() * 1000);
+            if (sensors.front_tof <= 60 || sensors.center_bottom_tof <= 60)
+            {
+                break;
+            }
+        }
+    }
+
+    void go_33_release()
     {
         sensors.set_steering_mode(STEER_NORMAL);
         motion.start_move(END_BOX_DISTANCE, RUN_SPEED, 0, ACCELERATION);
@@ -409,20 +419,24 @@ public:
         }
     }
 
-    void grab(int height){
-        if (height <5){
+    void grab(int height)
+    {
+        if (height < 5)
+        {
             servos.liftDown();
         }
         servos.closeArms();
         servos.liftUp();
     }
 
-    void release(){
+    void release()
+    {
         servos.openArms();
 
-        motion.start_move(-REVERSE_DISTANCE, RUN_SPEED , 0, ACCELERATION);
+        motion.start_move(-REVERSE_DISTANCE, RUN_SPEED, 0, ACCELERATION);
 
-        while(!motion.move_finished()){
+        while (!motion.move_finished())
+        {
             delay(systick.getLoopTime() * 1000);
         }
     }
@@ -435,7 +449,6 @@ public:
         delay(400);
 
         servos.liftUp();
-        
 
         sensors.set_steering_mode(STEER_NORMAL);
         motion.start_move(BOX_BRANCH_DISTANCE, RUN_SPEED, 0, ACCELERATION);
@@ -455,7 +468,7 @@ public:
         servos.liftDown();
 
         turn_180();
-        delay(1100);
+        delay(9000);
 
         motion.reset_drive_system();
         sensors.set_steering_mode(STEER_NORMAL);
@@ -477,6 +490,25 @@ public:
         return height;
     }
 
+    void one_to_one()
+    {
+        turn_180();
+        delay(500);
+        go_28_aligning_line();
+        turn_right();
+        go_33_grab();
+        grab(5);
+        turn_180();
+        delay(1000);
+        go_33_release();
+        go_33_release();
+        release();
+        turn_180();
+        go_33_release();
+        turn_right();
+        go_28_aligning_line();
+    }
+
     void arrangeBox(bool isAscending)
     {
         systick.enableSlowMode(false);
@@ -496,14 +528,9 @@ public:
         reporter.sendMsg(height1);
         reporter.sendMsg(height2);
         reporter.sendMsg(height3);
+
+        one_to_one();
     }
-
-
-
-
-
-
-
 
     void pickUpfromCheckpoint()
     {
@@ -730,7 +757,7 @@ public:
             }
         }
 
-        sensors.disableUnknownToFollowing();
+        // sensors.disableUnknownToFollowing();
         motion.reset_drive_system();
 
         sensors.isInUneven = true;

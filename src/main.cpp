@@ -50,9 +50,9 @@ void setup()
   servos.begin();
   utils.begin();
 
-  //utils.turnOnEM();
+  utils.turnOnEM();
   utils.turnOffLED();
-  
+
   // switches.enableSimulation(true); // will accept serial inputs as switch data (until switches are connected)
 
   // systick.enableSlowMode(false);
@@ -63,9 +63,9 @@ void setup()
   // calibaration.calibrateSensors();
   // nvs.saveCalibrationData();
 
-  //nvs.loadCalibrationData();
+  // nvs.loadCalibrationData();
 
-  //printer.printCalibrationData();
+  // printer.printCalibrationData();
 
   // systick.enableSlowMode(false);
   // motion.reset_drive_system();
@@ -75,33 +75,48 @@ void setup()
 
 void loop()
 {
-  // uint16_t code = robot.detectBarCode() >> 3;
+  // int switchNum = switches.switchRead();
 
-  // reporter.sendMsg(code);
+  // switch (switchNum)
+  // {
+  // case 0:
+  //   uint16_t code = robot.detectBarCode() >> 3;
+  //   reporter.sendMsg(code);
+  //   uint16_t mazePosition = robot.maze_entrance(code);
+  //   bool order = robot.colorLineFollowing();
+  //   robot.dashLineFollowing();
+  //   robot.arrangeBox(order);
+  //   robot.pickUpfromCheckpoint();
+  //   robot.insertChamber();
+  //   robot.unevenTerrain();
+  //   break;
+  // case 1:
+  //   break;
+  // case 2:
+  //   break;
+  // case 3:
+  //   break;
+  // case 4:
+  //   break;
+  // case 5:
+  //   break;
+  // case 6:
+  //   break;
+  // case 7:
+  //   break;
+  // case 8:
+  //   break;
+  // }
 
-  // uint16_t mazePosition = robot.maze_entrance(code);
+  //robot.arrangeBox(true);
 
+  servos.closeArms();
 
+  servos.liftDown();
 
-  // bool order = robot.colorLineFollowing();
-  // robot.dashLineFollowing();
-
-
-  //robot.arrangeBox(order);
-
-  //robot.pickUpfromCheckpoint();
-
-  //robot.insertChamber();
-
-  //robot.unevenTerrain();
-
-  robot.arrangeBox(true);
-
+  servos.liftUp();
+  
   while ((true))
   {
-
   }
-  
-  
-
 }
