@@ -43,14 +43,14 @@ public:
     void liftUp()
     {
         servoLift.write(130);
-        delay(500);
+        delay(1200);
         servoLift.write(90);
         delay(500);
     }
 
     void liftDown(){
         servoLift.write(60);
-        delay(800);
+        delay(1200);
         servoLift.write(90);
         delay(500);
     }
