@@ -73,50 +73,81 @@ void setup()
   // sensors.enableUnknownToFollowing();
 }
 
-void loop()
-{
-  // int switchNum = switches.switchRead();
+void loop() {
+    int switchNum = switches.switchRead();
+    
+    uint16_t code = 0;
+    uint16_t mazePosition = 0;
+    uint16_t code2 = 0;
+    uint16_t mazePosition2 = 0;
+    bool order = false;
+    bool order2 = false;
 
-  // switch (switchNum)
-  // {
-  // case 0:
-  //   uint16_t code = robot.detectBarCode() >> 3;
-  //   reporter.sendMsg(code);
-  //   uint16_t mazePosition = robot.maze_entrance(code);
-  //   bool order = robot.colorLineFollowing();
-  //   robot.dashLineFollowing();
-  //   robot.arrangeBox(order);
-  //   robot.pickUpfromCheckpoint();
-  //   robot.insertChamber();
-  //   robot.unevenTerrain();
-  //   break;
-  // case 1:
-  //   break;
-  // case 2:
-  //   break;
-  // case 3:
-  //   break;
-  // case 4:
-  //   break;
-  // case 5:
-  //   break;
-  // case 6:
-  //   break;
-  // case 7:
-  //   break;
-  // case 8:
-  //   break;
-  // }
+    switch (switchNum) {
+        case 1: {
+            code = robot.detectBarCode() >> 3;
+            reporter.sendMsg(code);
+            mazePosition = robot.maze_entrance(code);
+            robot.indicatePosition(mazePosition);
+            order = robot.colorLineFollowing();
+            robot.dashLineFollowing();
+            robot.arrangeBox(order);
+            robot.pickUpfromCheckpoint();
+            robot.insertChamber();
+            robot.unevenTerrain();
+            break;
+        }
+        
+        case 2: {
+            code2 = robot.detectBarCode() >> 3;
+            reporter.sendMsg(code2);
+            mazePosition2 = robot.maze_entrance(code2);
+            robot.indicatePosition(mazePosition2);
+            break;
+        }
+        
+        case 3: {
+            order2 = robot.colorLineFollowing();
+            robot.dashLineFollowing();
+            break;
+        }
+        
+        case 4: {
+            robot.arrangeBox(true);
+            break;
+        }
+        
+        case 5: {
+            robot.pickUpfromCheckpoint();
+            break;
+        }
+        
+        case 6: {
+            robot.pickObjects();
+            break;
+        }
+        
+        case 7: {
+            robot.pickUpfromCheckpoint();
+            robot.pickObjects();
+            robot.insertChamber();
+            break;
+        }
+        
+        case 8: {
+            robot.unevenTerrain();
+            break;
+        }
+        
+        case 0: {
+            robot.insertChamber();
+            break;
+        }
+        
+        default: {
+           
+            break;
+        }
+    }
 
-  //robot.arrangeBox(true);
-
-  servos.closeArms();
-
-  servos.liftDown();
-
-  servos.liftUp();
-  
-  while ((true))
-  {
-  }
 }
