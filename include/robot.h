@@ -19,7 +19,7 @@ RobotHelpers helpers;
 class Robot
 {
 public:
-
+    // Task 1
     uint16_t detectBarCode()
     {
         uint16_t code = 0;
@@ -76,6 +76,7 @@ public:
         return code;
     }
 
+    // Task 2
     int8_t maze_entrance(int barcode)
     {
         motion.reset_drive_system();
@@ -258,6 +259,7 @@ public:
         return 0;
     }
 
+    // Task 3
     uint8_t colorLineFollowing()
     {
         systick.enableSlowMode(true);
@@ -338,6 +340,7 @@ public:
         return color == Sensors::BLUE ? 1 : 0; // ascending 1
     }
 
+    // Task 4
     void dashLineFollowing()
     {
 
@@ -362,25 +365,12 @@ public:
         sensors.set_steering_mode(STEERING_OFF);
     }
 
-        void one_to_one()
+    // Task 5
+    void gateDetection()
     {
-        helpers.turn_180();
-        delay(500);
-        helpers.go_28_align_line_after();
-        helpers.turn_right();
-        helpers.go_33_grab();
-        helpers.grab(5);
-        helpers.turn_180();
-        delay(1000);
-        helpers.go_33_release();
-        helpers.go_33_release();
-        helpers.release();
-        helpers.turn_180();
-        helpers.go_33_release();
-        helpers.turn_right();
-        helpers.go_28_align_line_after();
     }
 
+    // Task 6
     void arrangeBox(bool isAscending)
     {
         systick.enableSlowMode(false);
@@ -401,9 +391,10 @@ public:
         reporter.sendMsg(height2);
         reporter.sendMsg(height3);
 
-        one_to_one();
+        helpers.one_to_one();
     }
 
+    // Task 7
     void pickUpfromCheckpoint()
     {
         systick.enableSlowMode(false);
@@ -412,7 +403,7 @@ public:
         delay(100);
         sensors.disableUnknownToFollowing();
 
-        // servos.openArms();
+        servos.openArms();
         servos.liftDown();
 
         sensors.set_steering_mode(STEER_NORMAL);
@@ -505,6 +496,109 @@ public:
         helpers.turn_left();
     }
 
+    void pickObjects()
+    {
+        systick.enableSlowMode(false);
+        delay(500);
+        sensors.setFollowingColor(Sensors::BLACK);
+        delay(100);
+        sensors.disableUnknownToFollowing();
+        delay(500);
+        sensors.set_steering_mode(STEER_NORMAL);
+
+        motion.reset_drive_system();
+
+        motion.start_move(1000, RUN_SPEED, 0, ACCELERATION);
+
+        while (!motion.move_finished())
+        {
+            delayMicroseconds(systick.getLoopTime());
+
+            if (sensors.sensorColors[0] == Sensors::BLACK && sensors.sensorColors[1] == Sensors::BLACK)
+            {
+                break;
+            }
+        }
+
+        motion.reset_drive_system();
+
+        helpers.go(LINE_WIDTH, true);
+
+        sensors.set_steering_mode(STEER_NORMAL);
+
+        motion.reset_drive_system();
+
+        motion.start_move(1000, RUN_SPEED, 0, ACCELERATION);
+
+        while (!motion.move_finished())
+        {
+            delayMicroseconds(systick.getLoopTime());
+
+            if (sensors.sensorColors[0] == Sensors::BLACK && sensors.sensorColors[1] == Sensors::BLACK)
+            {
+                break;
+            }
+        }
+
+        helpers.go(MOVE_AFTER_DETECT, true);
+
+        helpers.turn_right();
+        delay(700);
+
+        servos.liftUp();
+        delay(1000);
+
+        sensors.set_steering_mode(STEER_NORMAL);
+        motion.reset_drive_system();
+        motion.start_move(1000, RUN_SPEED, 0, ACCELERATION);
+        while (!motion.move_finished())
+        {
+            delayMicroseconds(systick.getLoopTime());
+
+            if (sensors.sensorColors[1] == Sensors::BLACK && sensors.sensorColors[2] == Sensors::BLACK && sensors.sensorColors[3] == Sensors::BLACK)
+            {
+                break;
+            }
+        }
+
+        motion.reset_drive_system();
+
+        servos.liftDown();
+
+        helpers.turn_180();
+        delay(1000);
+
+        sensors.set_steering_mode(STEER_NORMAL);
+        motion.reset_drive_system();
+        motion.start_move(1000, RUN_SPEED, 0, ACCELERATION);
+        while (!motion.move_finished())
+        {
+            delayMicroseconds(systick.getLoopTime());
+
+            if (sensors.sensorColors[0] == Sensors::BLACK && sensors.sensorColors[4] == Sensors::BLACK)
+            {
+                break;
+            }
+        }
+        motion.reset_drive_system();
+        helpers.go(MOVE_AFTER_DETECT, true);
+        helpers.turn_right();
+        sensors.set_steering_mode(STEER_NORMAL);
+
+        motion.reset_drive_system();
+        motion.start_move(1000, RUN_SPEED, 0, ACCELERATION);
+
+        while (!motion.move_finished())
+        {
+            delayMicroseconds(systick.getLoopTime());
+
+            if (sensors.sensorColors[0] == Sensors::BLACK && sensors.sensorColors[1] == Sensors::BLACK)
+            {
+                break;
+            }
+        }
+    }
+
     void insertChamber()
     {
         systick.enableSlowMode(false);
@@ -569,6 +663,7 @@ public:
         helpers.turn_right();
     }
 
+    // Task 8
     void unevenTerrain()
     {
         systick.enableSlowMode(false);
@@ -683,112 +778,5 @@ public:
         utils.turnOffEM();
 
         sensors.isInUneven = false;
-    }
-
-    void pickObjects()
-    {
-        systick.enableSlowMode(false);
-        delay(500);
-        sensors.setFollowingColor(Sensors::BLACK);
-        delay(100);
-        sensors.disableUnknownToFollowing();
-        delay(500);
-        sensors.set_steering_mode(STEER_NORMAL);
-
-        motion.reset_drive_system();
-
-        motion.start_move(1000, RUN_SPEED, 0, ACCELERATION);
-
-        while (!motion.move_finished())
-        {
-            delayMicroseconds(systick.getLoopTime());
-
-            if (sensors.sensorColors[0] == Sensors::BLACK && sensors.sensorColors[1] == Sensors::BLACK)
-            {
-                break;
-            }
-        }
-
-        motion.reset_drive_system();
-
-        helpers.go(LINE_WIDTH, true);
-
-        sensors.set_steering_mode(STEER_NORMAL);
-
-        motion.reset_drive_system();
-
-        motion.start_move(1000, RUN_SPEED, 0, ACCELERATION);
-
-        while (!motion.move_finished())
-        {
-            delayMicroseconds(systick.getLoopTime());
-
-            if (sensors.sensorColors[0] == Sensors::BLACK && sensors.sensorColors[1] == Sensors::BLACK)
-            {
-                break;
-            }
-        }
-
-        helpers.go(MOVE_AFTER_DETECT, true);
-
-        helpers.turn_right();
-        delay(700);
-
-        servos.liftUp();
-        delay(1000);
-
-        sensors.set_steering_mode(STEER_NORMAL);
-        motion.reset_drive_system();
-        motion.start_move(1000, RUN_SPEED, 0, ACCELERATION);
-        while (!motion.move_finished())
-        {
-            delayMicroseconds(systick.getLoopTime());
-
-            if (sensors.sensorColors[1] == Sensors::BLACK && sensors.sensorColors[2] == Sensors::BLACK && sensors.sensorColors[3] == Sensors::BLACK)
-            {
-                break;
-            }
-        }
-
-        motion.reset_drive_system();
-
-        servos.liftDown();
-
-        helpers.turn_180();
-        delay(1000);
-
-        sensors.set_steering_mode(STEER_NORMAL);
-        motion.reset_drive_system();
-        motion.start_move(1000, RUN_SPEED, 0, ACCELERATION);
-        while (!motion.move_finished())
-        {
-            delayMicroseconds(systick.getLoopTime());
-
-            if (sensors.sensorColors[0] == Sensors::BLACK && sensors.sensorColors[4] == Sensors::BLACK)
-            {
-                break;
-            }
-        }
-        motion.reset_drive_system();
-
-        helpers.go(MOVE_AFTER_DETECT, true);
-
-        helpers.turn_right();
-
-        sensors.set_steering_mode(STEER_NORMAL);
-
-        motion.reset_drive_system();
-
-        motion.start_move(1000, RUN_SPEED, 0, ACCELERATION);
-
-        while (!motion.move_finished())
-        {
-            delayMicroseconds(systick.getLoopTime());
-
-            if (sensors.sensorColors[0] == Sensors::BLACK && sensors.sensorColors[1] == Sensors::BLACK)
-            {
-                break;
-            }
-        }
     }
 };

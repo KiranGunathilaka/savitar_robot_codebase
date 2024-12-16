@@ -206,4 +206,25 @@ public:
             }
         }
     }
+
+    void one_to_one()
+    {
+        turn_180();
+        delay(900);
+
+        go_28_align_line_after();
+        turn_right();
+        go_33_grab();
+        grab(5);
+        turn_180();
+        delay(900);
+
+        go_33_release();
+        go_33_release();
+        release();
+        turn_180();
+        go_33_release();
+        turn_right();
+        go_28_align_line_after();
+    }
 };
