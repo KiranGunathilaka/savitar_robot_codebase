@@ -40,7 +40,7 @@ public:
 
                           //printer.printTimeDiff();
                           //printer.printTof(true);
-                          printer.printAllColors(true);
+                          //printer.printAllColors(true);
                           //printer.printEncoderCounts();
                           //printer.printSteeringAdjustment(true);
                           //printer.printMotorFeedPercentages(true);

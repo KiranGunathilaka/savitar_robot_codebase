@@ -142,16 +142,17 @@ const int SERVO_GRIPPER_PIN = 38;
 const int SERVO_LIFT_PIN = 14;
 
 const int OPEN_ARM_ANGLE = 0;
-const int CLOSE_ARM_ANGLE = 95;
+const int CLOSE_ARM_ANGLE = 140;
 
 const float MIN_HEIGHT  = 50;
 const float MAX_HEIGHT  = 120; //in mm
 
 const int TOF_OFFSET = 15;
 
+const int HEIGHT_DETECTING_THRESHOLD = 120;
 //***********************************************************ROBOT*************************************************
 
-const int MOVE_AFTER_DETECT = 60;
+const int MOVE_AFTER_DETECT = 70;
 const int RUN_SPEED = 100;
 const int ACCELERATION = 1000;
 
@@ -160,15 +161,18 @@ const int READ_SPEED = 100;
 const int DIST_TO_BARRIER_FROM_LINE1 = 440;
 const int DIST_TO_BARRIER_FROM_LINE2 = 140;
 
-const int LINE_WIDTH = 40;
+const int LINE_WIDTH = 30;
 
 const int WALL_FOLLOWING_DIATANCE = 80;
 const int BOX_BRANCH_DISTANCE = 400;
-const int MIDDLE_BOX_DISTANCE = 280;
-const int END_BOX_DISTANCE  = 320;
-const int REVERSE_DISTANCE = 40;
 
+const int REVERSE_DISTANCE = 50;
 
+const int HEIGHT_DETECTING_DISTANCE = 60;
+const int PICKING_UP_DISTANCE = 30;
+
+const int CORRECTION_OFFSET_90 = 8;
+const int CORRECTION_OFFSET_180 = 17;
 //***********************************************************UTILS**************************************************
 const int LED_PIN =  0;      
 

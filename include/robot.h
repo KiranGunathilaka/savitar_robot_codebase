@@ -373,6 +373,8 @@ public:
     // Task 6
     void arrangeBox(bool isAscending)
     {
+        int height1, height2;
+
         systick.enableSlowMode(false);
         delay(300);
         sensors.set_steering_mode(STEER_NORMAL);
@@ -380,18 +382,123 @@ public:
         motion.reset_drive_system();
         sensors.enableUnknownToFollowing();
 
-        // servos.openArms();
+        servos.openArms();
         servos.liftDown();
 
-        int height1 = helpers.measureHeight(INITIAL_BOX_DISTANCE);
-        int height2 = helpers.measureHeight(MIDDLE_BOX_DISTANCE);
-        int height3 = 30 - height1 - height2;
+        helpers.go_align_line_after();
+        helpers.turn_left();
+        height1 = helpers.go_for_grab();
+        helpers.turn_180();
 
-        reporter.sendMsg(height1);
-        reporter.sendMsg(height2);
-        reporter.sendMsg(height3);
+        int fiveEqualTo;
 
-        helpers.one_to_one();
+        if(isAscending){
+            fiveEqualTo = 5;
+
+        }else{
+            fiveEqualTo = 15;
+        }
+
+        if (height1 == fiveEqualTo) // 1st position
+        {
+            height2 = helpers.goMirrored4shape();
+            if (height2 == 10) // 2nd position
+            {
+                helpers.goMirrored4shape();
+
+                helpers.go_align_line_after();
+                helpers.go_for_release();
+                helpers.turn_180();
+                helpers.go_align_line_after();
+                helpers.turn_right();
+
+                helpers.go_align_line_after();
+            }
+            else
+            {
+                helpers.go4shape();
+            }
+        }
+        else if (height1 == 10) // 1st position
+        {
+            height2 = helpers.go4shape();
+
+            if (height2 == fiveEqualTo) // 2nd position
+            {
+                helpers.goHalfSwatikaShape();
+
+                helpers.go_align_line_after();
+                helpers.turn_left();
+                helpers.go_for_grab();
+
+                helpers.turn_180();
+                helpers.go_align_line_after();
+                helpers.go_for_release();
+                helpers.turn_180();
+
+                helpers.go_align_line_after();
+                helpers.turn_right();
+                helpers.go_align_line_after();
+            }
+            else
+            {
+                helpers.go4shape();
+
+                helpers.go3To5();
+
+                helpers.go_align_line_after();
+                helpers.go_align_line_after();
+            }
+        }
+        else
+        {
+            helpers.go_align_line_after();
+            helpers.turn_left();
+            helpers.go_align_line_after();
+            helpers.go_align_line_after();
+            helpers.turn_right();
+            helpers.go_for_release();
+            helpers.turn_180();
+
+            // go for straight 3rd position instead of 2nd
+            helpers.go_align_line_after();
+            height2 = helpers.go_for_grab();
+            helpers.turn_180();
+
+            if (height2 == fiveEqualTo) // 3rd position
+            {
+                helpers.go3To5();
+
+                helpers.turn_left();
+                helpers.go_for_grab();
+                helpers.turn_180();
+                helpers.go_align_line_after();
+                helpers.go_for_release();
+                helpers.turn_180();
+                helpers.go_align_line_after();
+                helpers.turn_right();
+
+                helpers.go_align_line_after();
+                helpers.go_align_line_after();
+            }
+            else
+            {
+                helpers.go_align_line_after();
+                helpers.turn_right();
+                helpers.go_align_line_after();
+                helpers.turn_left();
+                helpers.go_for_release();
+                helpers.turn_180();
+                helpers.go_align_line_after();
+                helpers.go_for_grab();
+                helpers.turn_180();
+
+                helpers.goHalfSwatikaShape();
+                helpers.go_align_line_after();
+
+                helpers.go_align_line_after();
+            }
+        }
     }
 
     // Task 7
@@ -513,7 +620,6 @@ public:
         while (!motion.move_finished())
         {
             delayMicroseconds(systick.getLoopTime());
-
             if (sensors.sensorColors[0] == Sensors::BLACK && sensors.sensorColors[1] == Sensors::BLACK)
             {
                 break;
@@ -521,13 +627,9 @@ public:
         }
 
         motion.reset_drive_system();
-
         helpers.go(LINE_WIDTH, true);
-
         sensors.set_steering_mode(STEER_NORMAL);
-
         motion.reset_drive_system();
-
         motion.start_move(1000, RUN_SPEED, 0, ACCELERATION);
 
         while (!motion.move_finished())
