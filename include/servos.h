@@ -25,46 +25,63 @@ public:
 
     void openArms()
     {
+        servoGripper.attach(SERVO_GRIPPER_PIN);
+        delay(100);
         servoGripper.write(OPEN_ARM_ANGLE);
         delay(1000);
+        servoGripper.detach();
+        delay(100);
     }
 
     void closeArms()
     {
+        servoGripper.attach(SERVO_GRIPPER_PIN);
+        delay(200);
         servoGripper.write(CLOSE_ARM_ANGLE);
         delay(1000);
+        servoGripper.detach();
+        delay(100);
     }
 
     void closeArmsFull(){
+        servoGripper.attach(SERVO_GRIPPER_PIN);
+        delay(100);
         servoGripper.write(180);
         delay(1000);
+        servoGripper.detach();
+        delay(100);
     }
 
     void liftUp()
     {
+        servoLift.attach(SERVO_LIFT_PIN);
+        delay(100);
         servoLift.write(130);
         delay(1200);
         servoLift.write(90);
         delay(500);
+        servoLift.detach();
+        delay(100);
     }
 
     void liftDown(){
+        servoLift.attach(SERVO_LIFT_PIN);
+        delay(100);
         servoLift.write(60);
         delay(1200);
         servoLift.write(90);
         delay(500);
+        servoLift.detach();
+        delay(100);
     }
 
     int detectHeight(){
-        bool is5 = false;
-        bool is10 = false;
-        bool is15 = false;
 
-        if (sensors.center_top_tof <100){
+        if (sensors.center_top_tof < HEIGHT_DETECTING_THRESHOLD){
             return 15;
-        } else if (sensors.center_bottom_tof <100){
+        } else if (sensors.center_bottom_tof < HEIGHT_DETECTING_THRESHOLD){
             return 10;
-        }else if (sensors.front_tof < 100){
+        }else if (sensors.front_tof < HEIGHT_DETECTING_THRESHOLD){
             return 5;
         }
         return 0;
