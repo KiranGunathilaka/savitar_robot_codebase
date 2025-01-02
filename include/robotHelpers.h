@@ -58,6 +58,65 @@ public:
         }
     }
 
+    void go_maze_distance(bool shouldMove)
+    {
+        motion.reset_drive_system();
+        sensors.set_steering_mode(STEER_NORMAL);
+        motion.start_move(MAZE_DISTANCE, RUN_SPEED, 0, ACCELERATION);
+        while (!motion.move_finished())
+        {
+            delay(systick.getLoopTime() * 1000);
+            if (sensors.sensorColors[0] == sensors.getFollowingColor() && sensors.sensorColors[1] == sensors.getFollowingColor() || sensors.sensorColors[3] == sensors.getFollowingColor() && sensors.sensorColors[4] == sensors.getFollowingColor())
+            {
+                sensors.set_steering_mode(STEERING_OFF);
+                break;
+            }
+        }
+
+        if (shouldMove)
+        {
+            go(MOVE_AFTER_DETECT, true);
+        }
+
+        motion.reset_drive_system();
+    }
+
+    void go_maze_distance_reverse(bool shouldMove)
+    {
+        go(INITIAL_REVERSING_DISTANCE, false);
+
+        sensors.set_is_reverse(true);
+        motion.reset_drive_system();
+        sensors.set_steering_mode(STEERING_OFF);
+
+        motion.start_move(-MAZE_DISTANCE, RUN_SPEED, 0, ACCELERATION);
+        while (!motion.move_finished())
+        {
+            delay(systick.getLoopTime() * 1000);
+            if (sensors.sensorColors[0] == sensors.getFollowingColor() && sensors.sensorColors[1] == sensors.getFollowingColor() || sensors.sensorColors[3] == sensors.getFollowingColor() && sensors.sensorColors[4] == sensors.getFollowingColor())
+            {
+                sensors.set_steering_mode(STEERING_OFF);
+                break;
+            }
+        }
+
+        sensors.set_is_reverse(false);
+        if (shouldMove)
+        {
+            go(MOVE_AFTER_DETECT, true);
+        }
+        motion.reset_drive_system();
+    }
+
+    void mirroredCshapeInMaze()
+    {
+        helpers.go_maze_distance_reverse(true);
+        helpers.turn_left();
+        helpers.go_maze_distance(true);
+        helpers.turn_right();
+        helpers.go_maze_distance(true);
+    }
+
     void go_align_line_after()
     {
         motion.reset_drive_system();
@@ -73,6 +132,8 @@ public:
         }
 
         go(MOVE_AFTER_DETECT, true);
+
+        motion.reset_drive_system();
     }
 
     void grab(int height)
@@ -171,35 +232,6 @@ public:
         release();
     }
 
-    void go_30_maze(bool forward)
-    {
-        if (forward)
-        {
-            sensors.set_steering_mode(STEER_NORMAL);
-        }
-        else
-        {
-            sensors.set_steering_mode(STEERING_OFF);
-        }
-        motion.reset_drive_system();
-        motion.start_move((forward ? 1 : -1) * 300, RUN_SPEED, 0, ACCELERATION);
-        while (!motion.move_finished())
-        {
-            delay(systick.getLoopTime() * 1000);
-        }
-        if (sensors.sensorColors[0] == Sensors::WHITE && sensors.sensorColors[1] == Sensors::WHITE || sensors.sensorColors[4] == Sensors::WHITE && sensors.sensorColors[3] == Sensors::WHITE)
-        {
-            motion.reset_drive_system();
-
-            motion.start_move((forward ? 1 : -1) * 30, RUN_SPEED, 0, ACCELERATION);
-
-            while (!sensors.sensorColors[0] == Sensors::WHITE && sensors.sensorColors[1] == Sensors::WHITE || sensors.sensorColors[4] == Sensors::WHITE && sensors.sensorColors[3] == Sensors::WHITE)
-            {
-                delay(systick.getLoopTime() * 1000);
-            }
-        }
-    }
-
     // from here |   |
     //            --
     //           |
@@ -266,7 +298,6 @@ public:
         helpers.go_align_line_after();
         helpers.turn_right();
         helpers.go_align_line_after();
-
     }
 
     // functions that didn't use after new revision

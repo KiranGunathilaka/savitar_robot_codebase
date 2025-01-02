@@ -40,12 +40,12 @@ private:
     volatile float cross_track_error;
     volatile float steering_adjustment;
 
+    bool isReverse = false;
 public:
     bool tofEnabled = true;
     bool colourEnabled = true;
     bool isUnknownFollowingClr = true;
 
-    bool isInUneven = false;
 
     VL53L0X tofRight, tofLeft, tofFront, tofCenterTop, tofCenterBottom;
     int prevLeft, prevRight, prevFront, prevCenterTop, prevCenterBottom;
@@ -210,6 +210,10 @@ public:
         steering_mode = mode;
     }
 
+    void set_is_reverse(bool shouldReverse){
+        isReverse = shouldReverse;
+    }
+
     void calculate_steering_adjustment()
     {
         float pTerm = steering_kp * cross_track_error;
@@ -226,6 +230,11 @@ public:
         {
             steering_adjustment = abs(adjustment) > 2.0 ? adjustment > 0 ? 2 : -2 : adjustment;
         }
+
+        if(isReverse){
+            steering_adjustment *= -1;
+        }
+
     }
 
     void update()

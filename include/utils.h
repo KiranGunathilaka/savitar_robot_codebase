@@ -22,11 +22,13 @@ public:
     }
 
     void turnOnLED(){
+        delay(500);
         digitalWrite(LED_PIN, HIGH);
     }
 
     void turnOffLED(){
         digitalWrite(LED_PIN, LOW);
+        delay(500);
     }
 };
 

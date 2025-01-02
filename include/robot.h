@@ -77,33 +77,25 @@ public:
     }
 
     // Task 2
-    int8_t maze_entrance(int barcode)
+    void solve_maze(int barcode)
     {
+        bool wallExistOn1st = false;
+        uint modeBC = barcode % 5;
+
         motion.reset_drive_system();
         sensors.set_steering_mode(STEER_NORMAL);
-        sensors.setFollowingColor(Sensors::WHITE);
+        sensors.setFollowingColor(Sensors::BLACK); // temporily
         systick.enableSlowMode(false);
         sensors.disableUnknownToFollowing();
-
-        bool turnRight = false;
-        bool turnLeft = false;
 
         motion.start_move(1000, RUN_SPEED, 0, ACCELERATION);
 
         while (!motion.move_finished())
         {
-            if (sensors.sensorColors[0] == Sensors::WHITE)
+            if (sensors.sensorColors[0] == sensors.getFollowingColor())
             {
-                turnRight = true;
-                turnLeft = false;
                 break;
             }
-            else if (sensors.sensorColors[4] == Sensors::WHITE)
-            {
-                turnRight = false;
-                turnLeft = true;
-                break;
-            };
             delay(systick.getLoopTime() * 1000);
         }
 
@@ -111,14 +103,7 @@ public:
 
         motion.reset_drive_system();
 
-        if (turnLeft && !turnRight)
-        {
-            helpers.turn_left();
-        }
-        else if (!turnLeft && turnRight)
-        {
-            helpers.turn_right();
-        }
+        helpers.turn_right();
 
         sensors.set_steering_mode(STEER_NORMAL);
         motion.reset_drive_system();
@@ -126,137 +111,172 @@ public:
 
         while (!motion.move_finished())
         {
-            if (sensors.sensorColors[0] == Sensors::WHITE && sensors.sensorColors[1] == Sensors::WHITE || sensors.sensorColors[4] == Sensors::WHITE && sensors.sensorColors[3] == Sensors::WHITE)
+            delay(systick.getLoopTime() * 1000);
+            if (sensors.sensorColors[0] == sensors.getFollowingColor() && sensors.sensorColors[1] == sensors.getFollowingColor())
             {
                 sensors.set_steering_mode(STEERING_OFF);
                 break;
             }
-            delay(systick.getLoopTime() * 1000);
         }
         motion.reset_drive_system();
-        return barcode % 5;
-    }
 
-    int8_t indicatePosition(int position)
-    {
-        if (position == 0)
+        if (modeBC == 0)
         {
             utils.turnOnLED();
-            delay(1000);
-        }
-        else
-        {
+            helpers.go(MOVE_AFTER_DETECT, true);
             motion.reset_drive_system();
-            helpers.go(MOVE_AFTER_DETECT, true);
+
+            helpers.go_maze_distance(false);
+            utils.turnOffLED();
+
+            helpers.go_maze_distance_reverse(true);
 
             helpers.turn_right();
-            delay(600);
+            helpers.go_maze_distance(true);
+            helpers.turn_left();
+            helpers.go_maze_distance(true);
 
-            sensors.setFollowingColor(Sensors::WHITE);
-            sensors.set_steering_mode(STEER_NORMAL);
+            wallExistOn1st = sensors.center_bottom_tof <= OBSTACLE_MEASURING_DISTANCE;
+            reporter.sendMsg(1111);
 
-            if (position == 1)
-            {
+            helpers.turn_left();
+            helpers.go_maze_distance(false);
 
-                motion.start_move(400, RUN_SPEED, 0, ACCELERATION);
-                while (!motion.move_finished())
-                {
-                    delay(systick.getLoopTime() * 1000);
-                    if (sensors.sensorColors[3] == Sensors::WHITE && sensors.sensorColors[4] == Sensors::WHITE)
-                    {
-                        break;
-                    }
-                }
-                motion.reset_drive_system();
-                utils.turnOnLED();
-            }
-            else if (position == 2)
-            {
-                for (int i = 0; i < 2; i++)
-                {
-                    motion.start_move(400, RUN_SPEED, 0, ACCELERATION);
-                    while (!motion.move_finished())
-                    {
-                        delay(systick.getLoopTime() * 1000);
-                        if (sensors.sensorColors[3] == Sensors::WHITE && sensors.sensorColors[4] == Sensors::WHITE)
-                        {
-                            break;
-                        }
-                    }
-                    motion.reset_drive_system();
-                }
-                utils.turnOnLED();
-            }
-            else if (position == 3)
-            {
-                for (int i = 0; i < 3; i++)
-                {
-                    motion.start_move(400, RUN_SPEED, 0, ACCELERATION);
-                    while (!motion.move_finished())
-                    {
-                        delay(systick.getLoopTime() * 1000);
-                        if (sensors.sensorColors[3] == Sensors::WHITE && sensors.sensorColors[4] == Sensors::WHITE)
-                        {
-                            break;
-                        }
-                    }
-                    motion.reset_drive_system();
-                }
-                utils.turnOnLED();
-            }
-            else if (position == 2)
-            {
-                for (int i = 0; i < 4; i++)
-                {
-                    motion.start_move(400, RUN_SPEED, 0, ACCELERATION);
-                    while (!motion.move_finished())
-                    {
-                        delay(systick.getLoopTime() * 1000);
-                        if (sensors.sensorColors[3] == Sensors::WHITE && sensors.sensorColors[4] == Sensors::WHITE)
-                        {
-                            break;
-                        }
-                    }
-                    motion.reset_drive_system();
-                }
-                utils.turnOnLED();
-            }
-        }
-        return 0;
-    }
+            utils.turnOnLED();
 
-    int8_t solve_maze(int position)
-    {
-        bool coveredOneIsFirst = false;
-        if (position != 0)
-        {
-            helpers.go(LINE_WIDTH, true);
-            helpers.go_30_maze(true);
-            helpers.go(MOVE_AFTER_DETECT, true);
+            helpers.go_maze_distance_reverse(false);
+
+            if (wallExistOn1st)
+            {
+                helpers.go_maze_distance_reverse(false);
+                helpers.go_maze_distance_reverse(false);
+            }
+
+            utils.turnOffLED();
+
+            helpers.go_maze_distance_reverse(true);
+            helpers.turn_left();
+            helpers.go_maze_distance(true);
             helpers.turn_right();
-            helpers.go_30_maze(true);
+            helpers.go_maze_distance(true);
+            helpers.turn_right();
+            helpers.go_maze_distance(true);
+            utils.turnOnLED();
 
-            if (sensors.left_tof < DIST_TO_BARRIER_FROM_LINE2)
-            {
-                coveredOneIsFirst = true;
-            }
+            helpers.go(GRID_TO_COLOR_BOX_DISTANCE, true);
+            utils.turnOffLED();
         }
         else
         {
-            utils.turnOnLED();
-            helpers.go(LINE_WIDTH, true);
-            helpers.go_30_maze(true);
-            utils.turnOffLED();
-            helpers.go_30_maze(false); // go backward
-            helpers.turn_right();
-            helpers.go_30_maze(true);
+            helpers.go(MOVE_AFTER_DETECT, true);
+            motion.reset_drive_system();
 
-            if (sensors.left_tof < DIST_TO_BARRIER_FROM_LINE1)
+            helpers.go_maze_distance(true);
+            helpers.turn_right();
+            helpers.go_maze_distance(true);
+
+            wallExistOn1st = sensors.left_tof <= OBSTACLE_MEASURING_DISTANCE;
+
+            if (modeBC == 1)
             {
-                coveredOneIsFirst = true;
+                if (wallExistOn1st)
+                {
+                    helpers.turn_180();
+                    helpers.go_maze_distance(true);
+                    helpers.turn_left();
+                    helpers.go_maze_distance(true);
+                    helpers.turn_left();
+                    helpers.go_maze_distance(false);
+
+                    utils.turnOnLED();
+                    helpers.go(MOVE_AFTER_DETECT, true);
+                    helpers.go_maze_distance(true);
+                    helpers.go_maze_distance(false);
+                    utils.turnOffLED();
+
+                    helpers.mirroredCshapeInMaze();
+                }
             }
+
+            else if (modeBC == 2)
+            {
+                helpers.turn_right();
+                helpers.go_maze_distance(true);
+                helpers.turn_left();
+                helpers.go_maze_distance(false);
+                utils.turnOnLED();
+
+                if (!wallExistOn1st)
+                {
+                    helpers.go_maze_distance_reverse(false);
+                    utils.turnOffLED();
+                }
+                else
+                {
+                    helpers.go(MOVE_AFTER_DETECT, true);
+                    helpers.go_maze_distance(false);
+                    utils.turnOffLED();
+                }
+
+                helpers.mirroredCshapeInMaze();
+            }
+
+            else if (modeBC == 3)
+            {
+                if (wallExistOn1st)
+                {
+                    helpers.go_maze_distance(true);
+                    helpers.go_maze_distance(true);
+                }
+                else
+                {
+                    helpers.turn_right();
+                    helpers.go_maze_distance(true);
+                    helpers.turn_left();
+                    helpers.go_maze_distance(true);
+                    helpers.go_maze_distance(false);
+                    utils.turnOnLED();
+
+                    helpers.go_maze_distance_reverse(false);
+                    helpers.go_maze_distance_reverse(false);
+                    utils.turnOffLED();
+
+                    helpers.mirroredCshapeInMaze();
+                }
+            }
+
+            else if (modeBC == 4)
+            {
+                helpers.turn_right();
+                helpers.go_maze_distance(true);
+                helpers.turn_left();
+                helpers.go_maze_distance(true);
+                helpers.go_maze_distance(true);
+                helpers.go_maze_distance(false);
+                utils.turnOnLED();
+
+                helpers.go_maze_distance_reverse(false);
+
+                if(wallExistOn1st){
+                    utils.turnOffLED();
+                }else{
+                    helpers.go_maze_distance_reverse(false);
+                    helpers.go_maze_distance_reverse(false);
+                    utils.turnOffLED();
+                }
+
+                helpers.mirroredCshapeInMaze();
+            }
+
+            helpers.turn_right();
+            helpers.go_maze_distance(false);
+            utils.turnOnLED();
+            helpers.go_maze_distance_reverse(false);
+            helpers.go(GRID_TO_COLOR_BOX_DISTANCE, false);
+            utils.turnOffLED();
+
+            helpers.turn_180();
         }
-        return 0;
     }
 
     // Task 3
@@ -322,6 +342,7 @@ public:
             {
                 turnLeft = false;
                 turnRight = false;
+
                 helpers.go(LINE_WIDTH, true);
                 helpers.turn_left();
                 delay(400);
@@ -330,6 +351,7 @@ public:
             {
                 turnRight = false;
                 turnLeft = false;
+
                 helpers.go(LINE_WIDTH, true);
                 helpers.turn_right();
                 delay(400);
@@ -339,6 +361,7 @@ public:
         delay(100);
         return color == Sensors::BLUE ? 1 : 0; // ascending 1
     }
+
 
     // Task 4
     void dashLineFollowing()
@@ -392,10 +415,12 @@ public:
 
         int fiveEqualTo;
 
-        if(isAscending){
+        if (isAscending)
+        {
             fiveEqualTo = 5;
-
-        }else{
+        }
+        else
+        {
             fiveEqualTo = 15;
         }
 
@@ -878,7 +903,5 @@ public:
         }
 
         utils.turnOffEM();
-
-        sensors.isInUneven = false;
     }
 };
