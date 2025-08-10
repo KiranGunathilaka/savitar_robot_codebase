@@ -51,8 +51,6 @@
   </ul>
 
   <h2 style="margin:0 0 8px;">🧩 Firmware Modules</h2>
-  <div style="display:flex; gap:12px; flex-wrap:wrap;">
-
     <div style="flex:1; min-width:260px; border:1px solid #e5e7eb; border-radius:10px;">
       <div style="padding:10px 12px; background:#fafafa; border-bottom:1px solid #e5e7eb;"><strong>Motors</strong></div>
       <div style="padding:10px 12px;">
@@ -64,7 +62,6 @@
         <small style="color:#555;">KP/KD sets present for front/back, with per-wheel polarity and PWM channels.</small>
       </div>
     </div>
-
     <div style="flex:1; min-width:260px; border:1px solid #e5e7eb; border-radius:10px;">
       <div style="padding:10px 12px; background:#fafafa; border-bottom:1px solid #e5e7eb;"><strong>Motion</strong></div>
       <div style="padding:10px 12px;">
@@ -74,7 +71,6 @@
         </ul>
       </div>
     </div>
-
     <div style="flex:1; min-width:260px; border:1px solid #e5e7eb; border-radius:10px;">
       <div style="padding:10px 12px; background:#fafafa; border-bottom:1px solid #e5e7eb;"><strong>Sensors</strong></div>
       <div style="padding:10px 12px;">
@@ -85,7 +81,6 @@
         </ul>
       </div>
     </div>
-
     <div style="flex:1; min-width:260px; border:1px solid #e5e7eb; border-radius:10px;">
       <div style="padding:10px 12px; background:#fafafa; border-bottom:1px solid #e5e7eb;"><strong>Systick &amp; Robot</strong></div>
       <div style="padding:10px 12px;">
@@ -96,7 +91,6 @@
         </ul>
       </div>
     </div>
-
     <div style="flex:1; min-width:260px; border:1px solid #e5e7eb; border-radius:10px;">
       <div style="padding:10px 12px; background:#fafafa; border-bottom:1px solid #e5e7eb;"><strong>Reporting</strong></div>
       <div style="padding:10px 12px;">
@@ -106,8 +100,6 @@
         </ul>
       </div>
     </div>
-
-  </div>
 
   <h2 style="margin:14px 0 8px;">🔧 Hardware & Config Highlights</h2>
   <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px;">
